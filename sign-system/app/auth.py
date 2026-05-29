@@ -81,15 +81,52 @@ def delete_session(sid: str):
     _sessions.pop(sid, None)
 
 
+def _load_smsc_credentials() -> tuple[str, str] | None:
+    """Читает логин и пароль smsc.ru из config.json."""
+    if not CONFIG_PATH.exists():
+        return None
+    try:
+        data = json.loads(CONFIG_PATH.read_text(encoding="utf-8"))
+        login = data.get("smsc_login", "").strip()
+        password = data.get("smsc_password", "").strip()
+        if login and password:
+            return login, password
+    except Exception:
+        pass
+    return None
+
+
 def send_sms(phone: str, code: str) -> bool:
-    """Отправляет SMS. Возвращает True если отправлено, False если заглушка."""
-    print(f"[SMS] → {phone}  код: {code}")
-    # TODO: подключить SMS-провайдера, вернуть True после подключения
-    return False
-    # Пример mobizon.kz:
-    # import requests
-    # requests.get("https://api.mobizon.kz/service/message/sendsmsmessage", params={
-    #     "apiKey": "ВАШ_КЛЮЧ",
-    #     "recipient": phone,
-    #     "text": f"Код входа в ЦОМ: {code}. Действителен 5 минут.",
-    # })
+    """Отправляет SMS через smsc.ru. Возвращает True если отправлено."""
+    import requests as _requests
+
+    creds = _load_smsc_credentials()
+    if not creds:
+        print(f"[SMS] smsc.ru не настроен → {phone}  код: {code}")
+        return False
+
+    login, password = creds
+    text = f"Код входа в ЦОМ: {code}. Действителен 5 минут."
+
+    try:
+        resp = _requests.get(
+            "https://smsc.ru/sys/send.php",
+            params={
+                "login": login,
+                "psw": password,
+                "phones": phone,
+                "mes": text,
+                "fmt": 3,
+                "charset": "utf-8",
+            },
+            timeout=10,
+        )
+        data = resp.json()
+        if "error" in data:
+            print(f"[SMS] smsc.ru ошибка {data['error_code']}: {data['error']}")
+            return False
+        print(f"[SMS] → {phone}  id={data.get('id')}  cnt={data.get('cnt')}")
+        return True
+    except Exception as e:
+        print(f"[SMS] Ошибка отправки: {e}")
+        return False
