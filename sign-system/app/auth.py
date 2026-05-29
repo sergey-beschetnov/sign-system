@@ -98,7 +98,8 @@ def _load_smsc_credentials() -> tuple[str, str] | None:
 
 def send_sms(phone: str, code: str) -> bool:
     """Отправляет SMS через smsc.ru. Возвращает True если отправлено."""
-    import requests as _requests
+    from urllib.request import urlopen
+    from urllib.parse import urlencode
 
     creds = _load_smsc_credentials()
     if not creds:
@@ -109,19 +110,17 @@ def send_sms(phone: str, code: str) -> bool:
     text = f"Код входа в ЦОМ: {code}. Действителен 5 минут."
 
     try:
-        resp = _requests.get(
-            "https://smsc.ru/sys/send.php",
-            params={
-                "login": login,
-                "psw": password,
-                "phones": phone,
-                "mes": text,
-                "fmt": 3,
-                "charset": "utf-8",
-            },
-            timeout=10,
-        )
-        data = resp.json()
+        params = urlencode({
+            "login": login,
+            "psw": password,
+            "phones": phone,
+            "mes": text,
+            "fmt": 3,
+            "charset": "utf-8",
+        })
+        url = f"https://smsc.ru/sys/send.php?{params}"
+        with urlopen(url, timeout=10) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
         if "error" in data:
             print(f"[SMS] smsc.ru ошибка {data['error_code']}: {data['error']}")
             return False
