@@ -1,0 +1,1296 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Подписание договора — Центр Охранного Мониторинга</title>
+<link rel="stylesheet" href="/static/pcn-components.css">
+<link rel="stylesheet" href="/static/pcn-mobile.css">
+<style>
+  @font-face { font-family: 'Gilroy'; src: url('/static/fonts/Gilroy-Regular.ttf') format('truetype'); font-weight: 400; }
+  @font-face { font-family: 'Gilroy'; src: url('/static/fonts/Gilroy-Medium.ttf') format('truetype'); font-weight: 500; }
+  @font-face { font-family: 'Gilroy'; src: url('/static/fonts/Gilroy-Semibold.ttf') format('truetype'); font-weight: 600; }
+  @font-face { font-family: 'Gilroy'; src: url('/static/fonts/Gilroy-Bold.ttf') format('truetype'); font-weight: 700; }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    font-family: 'Gilroy', sans-serif;
+    background: #f5f6f8;
+    color: #1a1a1a;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── Override PCN header font ── */
+  .pcn-header, .pcn-mobile-header, .pcn-footer { font-family: 'Gilroy', sans-serif; }
+
+  /* ── Dropdown hover for desktop nav ── */
+  .pcn-dropdown:hover .pcn-dropdown-menu { display: block; }
+  .pcn-catalog-island:hover .pcn-catalog-mega { display: flex; }
+  .pcn-dropdown:hover svg { transform: rotate(180deg); }
+
+  /* ── Sign page layout ── */
+  .sign-wrap {
+    max-width: 660px;
+    margin: 0 auto;
+    padding: 28px 20px 60px;
+  }
+
+  /* ── Progress steps ── */
+  .sign-steps {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 24px;
+  }
+
+  .sign-step {
+    flex: 1;
+    height: 3px;
+    background: #e0e0e0;
+    border-radius: 2px;
+    transition: background 0.3s;
+  }
+
+  .sign-step.active { background: #4CAC26; }
+  .sign-step.done { background: #2e8a14; }
+
+  /* ── Step label ── */
+  .step-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 4px;
+  }
+
+  .step-sub {
+    font-size: 14px;
+    color: #7a7a7a;
+    margin-bottom: 20px;
+  }
+
+  /* ── Cards ── */
+  .card {
+    background: #fff;
+    border: 1px solid #e8e8e8;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 16px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  }
+
+  .card-title {
+    font-size: 11px;
+    font-weight: 700;
+    color: #9a9a9a;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 12px;
+  }
+
+  .info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+    padding: 9px 0;
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 14px;
+  }
+
+  .info-row:last-child { border-bottom: none; }
+  .info-row .label { color: #7a7a7a; white-space: nowrap; flex-shrink: 0; }
+  .info-row .value { font-weight: 600; color: #1a1a1a; text-align: right; }
+
+  /* ── Contract number highlight ── */
+  .contract-num {
+    font-size: 16px;
+    font-weight: 700;
+    color: #4CAC26;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .contract-num::before {
+    content: '';
+    width: 4px;
+    height: 18px;
+    background: #4CAC26;
+    border-radius: 2px;
+  }
+
+  /* ── PDF viewer ── */
+  .pdf-viewer-wrap {
+    background: #fff;
+    border: 1px solid #e8e8e8;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 16px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  }
+
+  .pdf-viewer-header {
+    padding: 12px 16px;
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 11px;
+    font-weight: 700;
+    color: #9a9a9a;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .pdf-viewer-header::before {
+    content: '';
+    width: 6px; height: 6px;
+    background: #4CAC26;
+    border-radius: 50%;
+  }
+
+  iframe#pdfFrame {
+    width: 100%;
+    height: 420px;
+    border: none;
+    display: block;
+    background: #fafafa;
+  }
+
+  /* ── Read confirmation ── */
+  .read-confirm {
+    background: #fff;
+    border: 2px solid #e8e8e8;
+    border-radius: 12px;
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    cursor: pointer;
+    transition: border-color 0.2s;
+    margin-bottom: 16px;
+    user-select: none;
+  }
+
+  .read-confirm:active { background: #fafafa; }
+  .read-confirm.checked { border-color: #4CAC26; background: #f6fbf3; }
+
+  .check-box {
+    width: 22px; height: 22px;
+    border: 2px solid #d0d0d0;
+    border-radius: 5px;
+    flex-shrink: 0;
+    transition: all 0.2s;
+    position: relative;
+    background: #fff;
+  }
+
+  .read-confirm.checked .check-box {
+    background: #4CAC26;
+    border-color: #4CAC26;
+  }
+
+  .check-box::after {
+    content: '';
+    position: absolute;
+    top: 3px; left: 6px;
+    width: 6px; height: 10px;
+    border: 2px solid #fff;
+    border-top: none;
+    border-left: none;
+    transform: rotate(45deg);
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  .read-confirm.checked .check-box::after { opacity: 1; }
+
+  .read-confirm p {
+    font-size: 14px;
+    color: #333;
+    line-height: 1.5;
+  }
+
+  /* ── Signature canvas ── */
+  .sig-label {
+    font-size: 13px;
+    color: #7a7a7a;
+    margin-bottom: 8px;
+  }
+
+  .canvas-wrap {
+    background: #fff;
+    border-radius: 10px;
+    border: 2px dashed #d0d0d0;
+    overflow: hidden;
+    position: relative;
+    transition: border-color 0.2s, border-style 0.2s;
+    touch-action: none;
+  }
+
+  .canvas-wrap.has-sig {
+    border-color: #4CAC26;
+    border-style: solid;
+  }
+
+  #sigCanvas {
+    display: block;
+    width: 100%;
+    height: 190px;
+    cursor: crosshair;
+    touch-action: none;
+  }
+
+  .canvas-hint {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    pointer-events: none;
+    transition: opacity 0.3s;
+  }
+
+  .canvas-hint.hidden { opacity: 0; }
+
+  .canvas-hint svg {
+    width: 30px; height: 30px;
+    margin-bottom: 8px;
+    opacity: 0.25;
+  }
+
+  .canvas-hint p {
+    font-size: 13px;
+    color: #bbb;
+    font-family: 'Gilroy', sans-serif;
+  }
+
+  .canvas-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+  }
+
+  .btn-clear {
+    flex: 1;
+    padding: 10px;
+    background: transparent;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    color: #888;
+    font-size: 13px;
+    cursor: pointer;
+    font-family: 'Gilroy', sans-serif;
+    transition: all 0.2s;
+  }
+
+  .btn-clear:hover { border-color: #bbb; color: #444; }
+
+  /* ── Input fields ── */
+  .field-label {
+    display: block;
+    font-size: 11px;
+    font-weight: 700;
+    color: #9a9a9a;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 7px;
+  }
+
+  input[type="text"] {
+    width: 100%;
+    padding: 13px 16px;
+    background: #fafafa;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    color: #1a1a1a;
+    font-size: 15px;
+    font-family: 'Gilroy', sans-serif;
+    outline: none;
+    transition: border-color 0.2s, background 0.2s;
+    margin-bottom: 16px;
+  }
+
+  input[type="text"]:focus { border-color: #4CAC26; background: #fff; }
+  input[type="text"]::placeholder { color: #bbb; }
+
+  /* ── Primary button ── */
+  .btn-primary {
+    width: 100%;
+    padding: 16px;
+    background: #4CAC26;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 700;
+    font-family: 'Gilroy', sans-serif;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .btn-primary:hover { background: #3a8f1e; }
+  .btn-primary:active { transform: scale(0.99); }
+  .btn-primary:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
+
+  /* ── Trust banner ── */
+  .trust-banner {
+    background: #fff;
+    border: 1px solid #e8e8e8;
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  }
+
+  .trust-icon {
+    width: 42px; height: 42px;
+    background: #f6fbf3;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .trust-icon svg { width: 20px; height: 20px; color: #4CAC26; }
+
+  .trust-text h4 {
+    font-size: 13px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 2px;
+  }
+
+  .trust-text p { font-size: 12px; color: #7a7a7a; }
+
+  /* ── Success screen ── */
+  .success-wrap {
+    text-align: center;
+    padding: 40px 0;
+  }
+
+  .success-circle {
+    width: 72px; height: 72px;
+    background: #f6fbf3;
+    border: 2px solid #4CAC26;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 24px;
+    font-size: 30px;
+    color: #4CAC26;
+  }
+
+  .success-wrap h2 {
+    font-size: 22px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 8px;
+  }
+
+  .success-wrap p {
+    font-size: 14px;
+    color: #7a7a7a;
+    line-height: 1.6;
+    margin-bottom: 4px;
+  }
+
+  .download-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 24px;
+    padding: 14px 28px;
+    background: #4CAC26;
+    color: #fff;
+    border-radius: 10px;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 700;
+    font-family: 'Gilroy', sans-serif;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    transition: background 0.2s;
+  }
+
+  .download-btn:hover { background: #3a8f1e; }
+
+  .meta-card {
+    background: #fafafa;
+    border: 1px solid #e8e8e8;
+    border-radius: 10px;
+    padding: 16px;
+    margin-top: 20px;
+    text-align: left;
+  }
+
+  .meta-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 7px 0;
+    font-size: 13px;
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  .meta-row:last-child { border-bottom: none; }
+  .meta-row span:first-child { color: #888; }
+  .meta-row span:last-child {
+    color: #1a1a1a;
+    font-weight: 600;
+    word-break: break-all;
+    text-align: right;
+    max-width: 60%;
+  }
+
+  /* ── Loading overlay ── */
+  .loading-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(255,255,255,0.9);
+    z-index: 5000;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .loading-overlay.active { display: flex; }
+
+  .spinner {
+    width: 38px; height: 38px;
+    border: 3px solid #e0e0e0;
+    border-top-color: #4CAC26;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .loading-overlay p {
+    font-size: 13px;
+    color: #888;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    font-family: 'Gilroy', sans-serif;
+  }
+
+  /* ── Toast ── */
+  .toast {
+    position: fixed;
+    bottom: 24px; left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: #d94040;
+    color: #fff;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: 'Gilroy', sans-serif;
+    z-index: 6000;
+    transition: transform 0.3s;
+    white-space: nowrap;
+    box-shadow: 0 4px 16px rgba(217,64,64,0.3);
+  }
+
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* ── Back button ── */
+  .btn-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px 8px 10px;
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 20px;
+    color: #555;
+    font-size: 13px;
+    font-family: 'Gilroy', sans-serif;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-bottom: 14px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+
+  .btn-back:hover {
+    border-color: #4CAC26;
+    color: #4CAC26;
+    background: #f6fbf3;
+  }
+
+  .btn-back svg {
+    flex-shrink: 0;
+    transition: transform 0.2s;
+  }
+
+  .btn-back:hover svg { transform: translateX(-2px); }
+
+  /* ── Screen visibility ── */
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* ── Responsive: hide desktop header on mobile ── */
+  @media (max-width: 900px) {
+    .pcn-header { display: none !important; }
+    .pcn-mobile-header { display: block !important; }
+  }
+
+  @media (min-width: 901px) {
+    .pcn-mobile-header { display: none !important; }
+  }
+
+  @media (max-width: 480px) {
+    .sign-wrap { padding: 20px 16px 50px; }
+    .step-title { font-size: 18px; }
+    iframe#pdfFrame { height: 300px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Loading overlay -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="spinner"></div>
+  <p>Обработка подписи</p>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- ══════════════ PCN Desktop Header (full) ══════════════ -->
+<header class="pcn-header">
+    <div class="pcn-header-inner">
+        <div class="pcn-logo-block">
+            <a href="https://pcn.kz" class="pcn-logo-link" target="_blank">
+                <img src="/static/logo.png" alt="Центр Охранного Мониторинга" class="pcn-logo">
+            </a>
+        </div>
+
+        <div class="pcn-header-content">
+            <div class="pcn-header-top">
+                <nav class="pcn-nav">
+                    <div class="pcn-catalog-island" id="pcnCatalogIsland">
+                        <button class="pcn-catalog-btn" id="pcnCatalogBtn" type="button" aria-expanded="false" aria-haspopup="true" disabled style="pointer-events:none;cursor:default;">
+                            <img src="/static/icons/WidgetIsland.svg" class="cat-grid" alt="" aria-hidden="true">
+                            <span>Каталог</span>
+                            <svg class="cat-chevron" viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+                        </button>
+                    </div>
+                    <div class="pcn-dropdown">
+                        <span>Услуги</span>
+                        <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9" /></svg>
+                        <div class="pcn-dropdown-menu">
+                            <a href="https://pcn.kz/services" target="_blank">Все услуги</a>
+                            <a href="https://pcn.kz/services#security-services" target="_blank">Охранные услуги</a>
+                            <a href="https://pcn.kz/calculator.html?new=true" target="_blank">Собрать систему безопасности</a>
+                            <a href="https://pcn.kz/armed-escort.html" target="_blank">Вооруженное Сопровождение</a>
+                            <a href="https://pcn.kz/vtorjenie.html" target="_blank">Охранная сигнализация с выездом "Кузет"</a>
+                            <a href="https://pcn.kz/napadenie.html" target="_blank">Тревожная кнопка с выездом "Кузет"</a>
+                            <a href="https://pcn.kz/services#safe-protection" target="_blank">Защита сейфов</a>
+                            <a href="https://pcn.kz/services#equipment-rental" target="_blank">Аренда оборудования</a>
+                        </div>
+                    </div>
+                    <div class="pcn-dropdown">
+                        <span>Компания</span>
+                        <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9" /></svg>
+                        <div class="pcn-dropdown-menu">
+                            <a href="https://pcn.kz/#main" target="_blank">О нас</a>
+                            <a href="https://pcn.kz/#achievements" target="_blank">Наши достижения</a>
+                            <a href="https://pcn.kz/certificate.html" target="_blank">Сертификаты</a>
+                            <a href="https://pcn.kz/#partners" target="_blank">Сотрудничество</a>
+                            <a href="https://pcn.kz/jobs" target="_blank">Вакансии</a>
+                            <a href="https://pcn.kz/blog.html" target="_blank">Блог</a>
+                        </div>
+                    </div>
+                    <div class="pcn-dropdown">
+                        <span>Акции</span>
+                        <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9" /></svg>
+                        <div class="pcn-dropdown-menu">
+                            <a href="https://pcn.kz/hikvision.html" target="_blank">AX Home 0₸</a>
+                            <a href="https://pcn.kz/ajax-systems.html" target="_blank">Ajax 0₸</a>
+                            <a href="https://pcn.kz/promotions/trade-in" target="_blank">Trade-In</a>
+                            <a href="https://pcn.kz/promotions/birthday" target="_blank">День рождения</a>
+                            <a href="https://pcn.kz/promotions/friend-sale" target="_blank">Приведи друга</a>
+                        </div>
+                    </div>
+                    <a href="https://pcn.kz/#form-wrapper" class="pcn-link" target="_blank">Оплата</a>
+                </nav>
+
+                <div class="pcn-header-right">
+                    <div class="pcn-phone">
+                        <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.08 4.18 2 2 0 0 1 4 2h3a2 2 0 0 1 2 1.72c.1.81.3 1.6.57 2.34a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.74-1.74a2 2 0 0 1 2.11-.45c.74.27 1.53.47 2.34.57a2 2 0 0 1 1.72 2z"/></svg>
+                        +7 727 339 77 00 <small>( с 08:00 – 17:00 )</small>
+                    </div>
+                    <div class="pcn-lang-wrap">
+                        <button type="button" class="pcn-lang" id="pcnLangBtn" aria-expanded="false" aria-haspopup="listbox" aria-label="Язык">
+                            <span class="pcn-lang-current">Ru</span>
+                            <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9" /></svg>
+                        </button>
+                        <div class="pcn-lang-dropdown" hidden role="listbox">
+                            <button type="button" class="pcn-lang-option" role="option">English</button>
+                            <button type="button" class="pcn-lang-option" role="option">Русский</button>
+                            <button type="button" class="pcn-lang-option" role="option">Қазақша</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pcn-header-bottom">
+                <div class="pcn-search-wrapper">
+                    <input type="text" class="pcn-search-input" placeholder="Поиск...">
+                    <span class="pcn-search-icon">
+                        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" /><line x1="16.5" y1="16.5" x2="22" y2="22" /></svg>
+                    </span>
+                </div>
+                <div class="pcn-icons">
+                    <div class="pcn-icon-item">
+                        <img src="/static/icons/Group 1900.svg" alt="Сравнение">
+                        <div>Сравнение</div>
+                    </div>
+                    <div class="pcn-icon-item">
+                        <img src="/static/icons/Group 1902.svg" alt="Избранное">
+                        <div>Избранное</div>
+                    </div>
+                    <div class="pcn-icon-item">
+                        <img src="/static/icons/Group 1903.svg" alt="Корзина">
+                        <div>Корзина</div>
+                    </div>
+                    <div class="pcn-icon-item">
+                        <img src="/static/icons/Group 1904.svg" alt="Войти">
+                        <div>Войти</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- ══════════════ PCN Mobile Header (full) ══════════════ -->
+<header class="pcn-mobile-header">
+    <div class="pcn-mobile-header-inner">
+        <div class="pcn-mobile-logo">
+            <a href="https://pcn.kz" class="pcn-logo-link" target="_blank">
+                <img src="/static/logo.png" alt="Центр Охранного Мониторинга" class="pcn-logo">
+            </a>
+        </div>
+        <div class="pcn-mobile-actions">
+            <button class="pcn-mobile-menu-btn" onclick="toggleMobileMenu()">
+                <svg viewBox="0 0 24 24">
+                    <line x1="12" y1="6" x2="21" y2="6"></line>
+                    <line x1="3" y1="12" x2="21" y2="12"></line>
+                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <div class="pcn-mobile-menu" id="pcnMobileMenu">
+        <div class="pcn-mobile-menu-header">
+            <div class="pcn-mobile-menu-logo">
+                <img src="/static/logo.png" alt="Центр Охранного Мониторинга" class="pcn-logo">
+            </div>
+            <button class="pcn-mobile-menu-close" onclick="toggleMobileMenu()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+
+        <nav class="pcn-mobile-nav">
+            <div class="pcn-mobile-dropdown">
+                <div class="pcn-mobile-dropdown-header" onclick="toggleMobileDropdown(this)">
+                    <div class="pcn-mobile-dropdown-header-left">
+                        <div class="pcn-mobile-dropdown-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>
+                        </div>
+                        <span>Услуги</span>
+                    </div>
+                    <svg class="pcn-mobile-dropdown-arrow" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z" fill="currentColor"/></svg>
+                </div>
+                <div class="pcn-mobile-dropdown-content">
+                    <a href="https://pcn.kz/services" target="_blank">Все услуги</a>
+                    <a href="https://pcn.kz/services#security-services" target="_blank">Охранные услуги</a>
+                    <a href="https://pcn.kz/calculator.html?new=true" target="_blank">Собрать систему безопасности</a>
+                    <a href="https://pcn.kz/armed-escort.html" target="_blank">Вооруженное Сопровождение</a>
+                    <a href="https://pcn.kz/vtorjenie.html" target="_blank">Охранная сигнализация с выездом "Кузет"</a>
+                    <a href="https://pcn.kz/napadenie.html" target="_blank">Тревожная кнопка с выездом "Кузет"</a>
+                    <a href="https://pcn.kz/services#safe-protection" target="_blank">Защита сейфов</a>
+                    <a href="https://pcn.kz/services#equipment-rental" target="_blank">Аренда оборудования</a>
+                </div>
+            </div>
+
+            <div class="pcn-mobile-dropdown">
+                <div class="pcn-mobile-dropdown-header" onclick="toggleMobileDropdown(this)">
+                    <div class="pcn-mobile-dropdown-header-left">
+                        <div class="pcn-mobile-dropdown-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3h18v18H3z"></path><path d="M9 9h6v6H9z"></path></svg>
+                        </div>
+                        <span>Каталог</span>
+                    </div>
+                    <svg class="pcn-mobile-dropdown-arrow" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z" fill="currentColor"/></svg>
+                </div>
+                <div class="pcn-mobile-dropdown-content">
+                    <a href="https://pcn.kz/vtorjenie.html" target="_blank">Решения от вторжения</a>
+                    <a href="https://pcn.kz/napadenie.html" target="_blank">Решения от нападения</a>
+                    <a href="https://pcn.kz/videonabludenie.html" target="_blank">Видеонаблюдение</a>
+                    <a href="https://pcn.kz/domofon.html" target="_blank">Домофония</a>
+                    <a href="https://pcn.kz/antipotop.html" target="_blank">Система Антипотоп</a>
+                </div>
+            </div>
+
+            <div class="pcn-mobile-dropdown">
+                <div class="pcn-mobile-dropdown-header" onclick="toggleMobileDropdown(this)">
+                    <div class="pcn-mobile-dropdown-header-left">
+                        <div class="pcn-mobile-dropdown-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                        </div>
+                        <span>Компания</span>
+                    </div>
+                    <svg class="pcn-mobile-dropdown-arrow" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z" fill="currentColor"/></svg>
+                </div>
+                <div class="pcn-mobile-dropdown-content">
+                    <a href="https://pcn.kz/#main" target="_blank">О нас</a>
+                    <a href="https://pcn.kz/#achievements" target="_blank">Наши достижения</a>
+                    <a href="https://pcn.kz/certificate.html" target="_blank">Сертификаты</a>
+                    <a href="https://pcn.kz/#partners" target="_blank">Сотрудничество</a>
+                    <a href="https://pcn.kz/jobs" target="_blank">Вакансии</a>
+                    <a href="https://pcn.kz/blog.html" target="_blank">Блог</a>
+                </div>
+            </div>
+
+            <div class="pcn-mobile-dropdown">
+                <div class="pcn-mobile-dropdown-header" onclick="toggleMobileDropdown(this)">
+                    <div class="pcn-mobile-dropdown-header-left">
+                        <div class="pcn-mobile-dropdown-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>
+                        </div>
+                        <span>Акции</span>
+                    </div>
+                    <svg class="pcn-mobile-dropdown-arrow" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z" fill="currentColor"/></svg>
+                </div>
+                <div class="pcn-mobile-dropdown-content">
+                    <a href="https://pcn.kz/hikvision.html" target="_blank">AX Home 0₸</a>
+                    <a href="https://pcn.kz/ajax-systems.html" target="_blank">Ajax 0₸</a>
+                    <a href="https://pcn.kz/promotions/trade-in" target="_blank">Trade-In</a>
+                    <a href="https://pcn.kz/promotions/birthday" target="_blank">День рождения</a>
+                    <a href="https://pcn.kz/promotions/friend-sale" target="_blank">Приведи друга</a>
+                    <a href="https://pcn.kz/promotions/business" target="_blank">Бизнес в плюсе</a>
+                </div>
+            </div>
+
+            <a href="https://pcn.kz/#form-wrapper" class="pcn-mobile-link" target="_blank">
+                <div class="pcn-mobile-link-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+                </div>
+                <span>Оплата</span>
+            </a>
+        </nav>
+
+        <div class="pcn-mobile-lang-row">
+            <span class="pcn-mobile-lang-label">Язык</span>
+            <div class="pcn-lang-wrap pcn-mobile-lang-wrap">
+                <button type="button" class="pcn-lang" id="pcnLangBtnMobile" aria-expanded="false" aria-haspopup="listbox" aria-label="Язык">
+                    <span class="pcn-lang-current">Ru</span>
+                    <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9" /></svg>
+                </button>
+                <div class="pcn-lang-dropdown" hidden role="listbox">
+                    <button type="button" class="pcn-lang-option" role="option">English</button>
+                    <button type="button" class="pcn-lang-option" role="option">Русский</button>
+                    <button type="button" class="pcn-lang-option" role="option">Қазақша</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="pcn-mobile-menu-phone">
+            <a href="tel:+77273397700" class="pcn-mobile-menu-phone-link">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.08 4.18 2 2 0 0 1 4 2h3a2 2 0 0 1 2 1.72c.1.81.3 1.6.57 2.34a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.74-1.74a2 2 0 0 1 2.11-.45c.74.27 1.53.47 2.34.57a2 2 0 0 1 1.72 2z"/></svg>
+                <span>+7 727 339 77 00</span>
+            </a>
+            <div class="pcn-mobile-menu-phone-time">с 08:00 – 17:00</div>
+        </div>
+
+        <div class="pcn-mobile-menu-search">
+            <input type="text" class="pcn-mobile-menu-search-input" placeholder="Поиск..." autocomplete="off">
+            <span class="pcn-mobile-menu-search-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="22" y2="22"/></svg>
+            </span>
+        </div>
+
+        <div class="pcn-mobile-quick-icons">
+            <a href="https://pcn.kz" target="_blank" class="pcn-mobile-quick-icon">
+                <img src="/static/icons/Group 1900.svg" alt="Сравнение">
+                <span>Сравнение</span>
+            </a>
+            <a href="https://pcn.kz" target="_blank" class="pcn-mobile-quick-icon">
+                <img src="/static/icons/Group 1902.svg" alt="Избранное">
+                <span>Избранное</span>
+            </a>
+            <a href="https://pcn.kz" target="_blank" class="pcn-mobile-quick-icon">
+                <img src="/static/icons/Group 1903.svg" alt="Корзина">
+                <span>Корзина</span>
+            </a>
+            <a href="https://pcn.kz" target="_blank" class="pcn-mobile-quick-icon">
+                <img src="/static/icons/Group 1904.svg" alt="Войти">
+                <span>Войти</span>
+            </a>
+        </div>
+
+        <div class="pcn-mobile-address">
+            <h4>Наш адрес</h4>
+            <div class="pcn-mobile-address-content">
+                <div class="pcn-mobile-address-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
+                </div>
+                <div class="pcn-mobile-address-text">
+                    <div class="pcn-mobile-address-main">Республика Казахстан, г. Алматы, ул. Ударная, 21А офис 1</div>
+                    <div class="pcn-mobile-address-sub">(ул. Байзакова, уг. ул. Жамбыла)</div>
+                    <div class="pcn-mobile-address-time">с 08:00 – 17:00</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="pcn-mobile-social">
+            <h4>Мы в социальных сетях</h4>
+            <div class="pcn-mobile-social-links">
+                <a href="https://www.instagram.com/pcn.kz" target="_blank" class="pcn-mobile-social-link" title="Instagram">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+                    <span>Instagram</span>
+                </a>
+                <a href="https://www.facebook.com/pcnkz" target="_blank" class="pcn-mobile-social-link" title="Facebook">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                    <span>Facebook</span>
+                </a>
+                <a href="https://www.tiktok.com/@pcn.kz" target="_blank" class="pcn-mobile-social-link" title="TikTok">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/></svg>
+                    <span>TikTok</span>
+                </a>
+                <a href="https://t.me/pcnkz" target="_blank" class="pcn-mobile-social-link" title="Telegram">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M9.78 18.65l.29-2.23 7.68-6.92c.34-.31-.07-.46-.52-.19L7.74 13.3 3.78 12c-.88-.25-.89-.86.2-1.3l15.97-6.16c.73-.33 1.43.18 1.15 1.3l-2.72 12.81c-.19.91-.74 1.13-1.5.7L12.6 16.3l-1.99 1.93c-.23.23-.42.42-.83.42z"/></svg>
+                    <span>Telegram</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- ══════════════ Main signing content ══════════════ -->
+<main>
+  <div class="sign-wrap">
+
+    <!-- Progress bar -->
+    <div class="sign-steps">
+      <div class="sign-step active" id="step1"></div>
+      <div class="sign-step" id="step2"></div>
+      <div class="sign-step" id="step3"></div>
+    </div>
+
+    <!-- ── Screen 1: Ознакомление с договором ── -->
+    <div class="screen active" id="screen1">
+      <div class="step-title">Ознакомьтесь с договором</div>
+      <div class="step-sub">Прочитайте документ перед подписанием</div>
+
+      <!-- Trust banner -->
+      <div class="trust-banner">
+        <div class="trust-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <div class="trust-text">
+          <h4>Защищённое подписание</h4>
+          <p>Ваша подпись шифруется и надёжно сохраняется в документе. Данные защищены и доступны только вам.</p>
+        </div>
+      </div>
+
+      <!-- Contract details card -->
+      <div class="card">
+        <div class="contract-num">Договор № {{CONTRACT_NUMBER}}</div>
+        <div class="info-row">
+          <span class="label">Клиент</span>
+          <span class="value">{{CLIENT_NAME}}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Исполнитель</span>
+          <span class="value">Центр Охранного Мониторинга</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Услуга</span>
+          <span class="value">Охрана объекта</span>
+        </div>
+      </div>
+
+      <!-- PDF viewer -->
+      <div class="pdf-viewer-wrap">
+        <div class="pdf-viewer-header">Текст договора</div>
+        <iframe id="pdfFrame" src="{{PDF_URL}}"></iframe>
+      </div>
+
+      <!-- Read confirmation -->
+      <div class="read-confirm" id="readConfirm" onclick="toggleRead()">
+        <div class="check-box" id="checkBox"></div>
+        <p>Я ознакомился с условиями договора и согласен с ними</p>
+      </div>
+
+      <button class="btn-primary" id="btnToSign" onclick="goToSign()" disabled>
+        Перейти к подписанию →
+      </button>
+    </div>
+
+    <!-- ── Screen 2: Подпись ── -->
+    <div class="screen" id="screen2">
+      <button class="btn-back" onclick="goBack()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        Вернуться к договору
+      </button>
+      <div class="step-title">Поставьте подпись</div>
+      <div class="step-sub">Нарисуйте вашу подпись пальцем или мышью</div>
+
+      <div class="card">
+        <label class="field-label">Ваше ФИО</label>
+        <input type="text" id="signerName" placeholder="Иванов Иван Иванович"
+               value="{{CLIENT_NAME}}" autocomplete="name">
+
+        <p class="sig-label">Нарисуйте подпись в поле ниже:</p>
+        <div class="canvas-wrap" id="canvasWrap">
+          <canvas id="sigCanvas"></canvas>
+          <div class="canvas-hint" id="canvasHint">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="1.5">
+              <path d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+            </svg>
+            <p>Подпишите здесь</p>
+          </div>
+        </div>
+        <div class="canvas-actions">
+          <button class="btn-clear" onclick="clearCanvas()">Очистить подпись</button>
+        </div>
+      </div>
+
+      <div class="trust-banner" style="margin-bottom:16px;">
+        <div class="trust-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        </div>
+        <div class="trust-text">
+          <h4>Ваши данные в безопасности</h4>
+          <p>Соединение зашифровано. Подпись сохраняется только в вашем экземпляре договора.</p>
+        </div>
+      </div>
+
+      <button class="btn-primary" id="btnSubmit" onclick="submitSignature()" disabled>
+        Подписать договор
+      </button>
+    </div>
+
+    <!-- ── Screen 3: Успех ── -->
+    <div class="screen" id="screen3">
+      <div class="success-wrap">
+        <div class="success-circle">✓</div>
+        <h2>Договор подписан</h2>
+        <p>Ваша подпись успешно принята и добавлена к договору.</p>
+        <p>Скачайте подписанный экземпляр для своих записей:</p>
+
+        <a class="download-btn" id="downloadBtn" href="#" download>
+          ↓ Скачать PDF
+        </a>
+
+        <div class="meta-card" id="metaCard">
+          <div class="meta-row">
+            <span>Подписант</span>
+            <span id="metaName">—</span>
+          </div>
+          <div class="meta-row">
+            <span>Дата и время</span>
+            <span id="metaDate">—</span>
+          </div>
+          <div class="meta-row">
+            <span>Договор №</span>
+            <span>{{CONTRACT_NUMBER}}</span>
+          </div>
+          <div class="meta-row">
+            <span>Хэш документа</span>
+            <span id="metaHash">—</span>
+          </div>
+        </div>
+
+        <div class="trust-banner" style="margin-top:20px;text-align:left;">
+          <div class="trust-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <div class="trust-text">
+            <h4>Договор действителен</h4>
+            <p>Подписанный файл содержит вашу электронную подпись. Обратитесь в ТОО «ЦОМ» по тел. <a href="tel:+77273397700" style="color:#4CAC26;">+7 727 339 77 00</a></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /.sign-wrap -->
+</main>
+
+<!-- ══════════════ PCN Footer ══════════════ -->
+<footer class="pcn-footer">
+  <div class="pcn-footer-container">
+    <div class="pcn-footer-section">
+      <h3 class="pcn-footer-title">ТОО «ЦЕНТР ОХРАННОГО МОНИТОРИНГА»</h3>
+      <div class="pcn-footer-contact-list">
+        <div class="pcn-footer-contact-item">
+          <div class="pcn-footer-icon">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><polyline points="9,22 9,12 15,12 15,22" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="pcn-footer-contact-text">
+            <span>Республика Казахстан, г. Алматы, ул. Ударная, 21А офис 1</span><br>
+            <span class="pcn-footer-subtext">(ул. Байзакова, уг. ул. Жамбыла)</span>
+          </div>
+        </div>
+        <div class="pcn-footer-contact-item">
+          <div class="pcn-footer-icon">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.08 4.18 2 2 0 0 1 4 2h3a2 2 0 0 1 2 1.72c.1.81.3 1.6.57 2.34a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.74-1.74a2 2 0 0 1 2.11-.45c.74.27 1.53.47 2.34.57a2 2 0 0 1 1.72 2z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="pcn-footer-contact-text">
+            <a href="tel:+77273397700">+7 727 339 77 00</a>
+            <span class="pcn-footer-subtext">Офис</span>
+          </div>
+        </div>
+        <div class="pcn-footer-contact-item">
+          <div class="pcn-footer-icon">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.08 4.18 2 2 0 0 1 4 2h3a2 2 0 0 1 2 1.72c.1.81.3 1.6.57 2.34a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.74-1.74a2 2 0 0 1 2.11-.45c.74.27 1.53.47 2.34.57a2 2 0 0 1 1.72 2z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="pcn-footer-contact-text">
+            <a href="tel:+77273397711">+7 727 339 77 11</a>
+            <span class="pcn-footer-subtext">ПЦН + Техподдержка</span>
+          </div>
+        </div>
+        <div class="pcn-footer-contact-item">
+          <div class="pcn-footer-icon">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><polyline points="22,6 12,13 2,6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="pcn-footer-contact-text">
+            <a href="mailto:sales@pcn.kz">sales@pcn.kz</a>
+            <span class="pcn-footer-subtext">Email</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pcn-footer-section">
+      <h3 class="pcn-footer-title">УСЛУГИ</h3>
+      <ul class="pcn-footer-links">
+        <li><a href="https://pcn.kz/vtorjenie.html" target="_blank">Охранная сигнализация с выездом</a></li>
+        <li><a href="https://pcn.kz/napadenie.html" target="_blank">Тревожная кнопка "Кузет"</a></li>
+        <li><a href="https://pcn.kz/videonabludenie.html" target="_blank">Видеонаблюдение</a></li>
+        <li><a href="https://pcn.kz/domofon.html" target="_blank">Домофония</a></li>
+        <li><a href="https://pcn.kz/antipotop.html" target="_blank">Система Антипотоп</a></li>
+        <li><a href="https://pcn.kz/armed-escort.html" target="_blank">Вооруженное сопровождение</a></li>
+      </ul>
+    </div>
+
+    <div class="pcn-footer-section">
+      <h3 class="pcn-footer-title">ДОКУМЕНТЫ</h3>
+      <ul class="pcn-footer-links">
+        <li><a href="https://pcn.kz/documents/user-agreement.html" target="_blank">Пользовательское соглашение</a></li>
+        <li><a href="https://pcn.kz/documents/public-offer.html" target="_blank">Публичная оферта</a></li>
+      </ul>
+    </div>
+
+    <div class="pcn-footer-section">
+      <h3 class="pcn-footer-title">КОНТАКТЫ</h3>
+      <ul class="pcn-footer-links">
+        <li><a href="https://pcn.kz/#main" target="_blank">О компании</a></li>
+        <li><a href="https://pcn.kz/certificate.html" target="_blank">Сертификаты</a></li>
+        <li><a href="https://pcn.kz/jobs" target="_blank">Вакансии</a></li>
+      </ul>
+
+      <div class="pcn-footer-social">
+        <h4>Мы в социальных сетях</h4>
+        <div class="pcn-footer-social-links">
+          <a href="https://t.me/CentrOhrannogoMonitoringa_bot" target="_blank" class="pcn-social-link" title="Telegram">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.19.19 0 0 0-.05-.2c-.06-.06-.14-.04-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27z"/></svg>
+          </a>
+          <a href="https://wa.me/77003397700" target="_blank" class="pcn-social-link" title="WhatsApp">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488"/></svg>
+          </a>
+          <a href="https://www.instagram.com/pcn.kz" target="_blank" class="pcn-social-link" title="Instagram">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+          </a>
+          <a href="https://www.facebook.com/pcnkz" target="_blank" class="pcn-social-link" title="Facebook">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="pcn-footer-bottom">
+    <div class="pcn-footer-bottom-container">
+      <div class="pcn-footer-copyright">
+        <p>© 2025 ТОО «ЦЕНТР ОХРАННОГО МОНИТОРИНГА». Все права защищены.</p>
+      </div>
+      <div class="pcn-footer-legal">
+        <a href="https://pcn.kz/documents/user-agreement.html" target="_blank">Пользовательское соглашение</a>
+        <span class="pcn-footer-separator">|</span>
+        <a href="https://pcn.kz/documents/public-offer.html" target="_blank">Публичная оферта</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+const TOKEN = "{{TOKEN}}";
+let hasSig = false;
+let isRead = false;
+
+// ── Canvas ──
+const canvas = document.getElementById('sigCanvas');
+const ctx = canvas.getContext('2d');
+let drawing = false;
+let lastX = 0, lastY = 0;
+
+function resizeCanvas() {
+  const rect = canvas.getBoundingClientRect();
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = rect.width * dpr;
+  canvas.height = rect.height * dpr;
+  ctx.scale(dpr, dpr);
+  ctx.strokeStyle = '#111';
+  ctx.lineWidth = 2.5;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+}
+
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+function getPos(e) {
+  const rect = canvas.getBoundingClientRect();
+  const src = e.touches ? e.touches[0] : e;
+  return { x: src.clientX - rect.left, y: src.clientY - rect.top };
+}
+
+function startDraw(e) {
+  e.preventDefault();
+  drawing = true;
+  const p = getPos(e);
+  lastX = p.x; lastY = p.y;
+  ctx.beginPath();
+  ctx.moveTo(lastX, lastY);
+}
+
+function draw(e) {
+  if (!drawing) return;
+  e.preventDefault();
+  const p = getPos(e);
+  ctx.lineTo(p.x, p.y);
+  ctx.stroke();
+  lastX = p.x; lastY = p.y;
+  if (!hasSig) {
+    hasSig = true;
+    document.getElementById('canvasHint').classList.add('hidden');
+    document.getElementById('canvasWrap').classList.add('has-sig');
+    checkSubmitReady();
+  }
+}
+
+function stopDraw() { drawing = false; ctx.beginPath(); }
+
+canvas.addEventListener('mousedown', startDraw);
+canvas.addEventListener('mousemove', draw);
+canvas.addEventListener('mouseup', stopDraw);
+canvas.addEventListener('touchstart', startDraw, { passive: false });
+canvas.addEventListener('touchmove', draw, { passive: false });
+canvas.addEventListener('touchend', stopDraw);
+
+function clearCanvas() {
+  const rect = canvas.getBoundingClientRect();
+  ctx.clearRect(0, 0, rect.width, rect.height);
+  hasSig = false;
+  document.getElementById('canvasHint').classList.remove('hidden');
+  document.getElementById('canvasWrap').classList.remove('has-sig');
+  document.getElementById('btnSubmit').disabled = true;
+}
+
+// ── Flow ──
+function toggleRead() {
+  isRead = !isRead;
+  document.getElementById('readConfirm').classList.toggle('checked', isRead);
+  document.getElementById('btnToSign').disabled = !isRead;
+}
+
+function goToSign() { showScreen(2); resizeCanvas(); }
+
+function goBack() {
+  clearCanvas();
+  showScreen(1);
+}
+
+function checkSubmitReady() {
+  const name = document.getElementById('signerName').value.trim();
+  document.getElementById('btnSubmit').disabled = !(hasSig && name.length > 2);
+}
+
+document.getElementById('signerName').addEventListener('input', checkSubmitReady);
+
+function showScreen(n) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen' + n).classList.add('active');
+  document.querySelectorAll('.sign-step').forEach((s, i) => {
+    s.classList.remove('active', 'done');
+    if (i + 1 < n) s.classList.add('done');
+    if (i + 1 === n) s.classList.add('active');
+  });
+  window.scrollTo(0, 0);
+}
+
+async function submitSignature() {
+  const name = document.getElementById('signerName').value.trim();
+  if (!hasSig) { showToast('Нарисуйте подпись'); return; }
+  if (name.length < 2) { showToast('Введите ФИО'); return; }
+
+  const sigB64 = canvas.toDataURL('image/png');
+  showLoading(true);
+
+  try {
+    const res = await fetch('/sign/submit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: TOKEN, signature_b64: sigB64, signer_name: name })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || 'Ошибка сервера');
+
+    showLoading(false);
+    document.getElementById('downloadBtn').href = data.download_url;
+    document.getElementById('metaName').textContent = name;
+    document.getElementById('metaDate').textContent = new Date().toLocaleString('ru-RU');
+    document.getElementById('metaHash').textContent = data.file_hash.substring(0, 24) + '...';
+    showScreen(3);
+  } catch (err) {
+    showLoading(false);
+    showToast(err.message || 'Ошибка при отправке');
+  }
+}
+
+function showLoading(show) {
+  document.getElementById('loadingOverlay').classList.toggle('active', show);
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ── PCN Mobile menu ──
+function toggleMobileMenu() {
+  document.getElementById('pcnMobileMenu').classList.toggle('active');
+}
+
+function toggleMobileDropdown(header) {
+  const dropdown = header.closest('.pcn-mobile-dropdown');
+  dropdown.classList.toggle('active');
+}
+</script>
+</body>
+</html>

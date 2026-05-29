@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  sign-system:
+    build: .
+    container_name: union-quzet-sign
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    volumes:
+      # Данные хранятся на QNAP, не теряются при перезапуске
+      - ./data/uploads:/app/uploads
+      - ./data/signed:/app/signed
+      - ./data/tokens.json:/app/tokens.json
+    environment:
+      - TZ=Asia/Almaty

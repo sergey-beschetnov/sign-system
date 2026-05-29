@@ -1,0 +1,888 @@
+
+.mobile-blocks-container {
+    display: none;
+    padding: 10px;
+}
+
+.mobile-hikvision-block-1 {
+    margin: 0;
+    border-radius: 0;
+    overflow: visible;
+    box-shadow: none;
+    display: none;
+    background-image: url('../assets/images/New year 1.svg') !important;
+    background-size: 100% 100% !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+    color: white !important;
+    position: relative;
+}
+
+.mobile-block-content {
+    position: relative;
+    z-index: 2;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    height: 100%;
+}
+
+.mobile-devices-container {
+    display: flex;
+    flex-direction: row;
+    gap: 4px;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.mobile-device-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    padding: 4px;
+    background: transparent;
+    flex: 1;
+    text-align: center;
+}
+
+.mobile-device-image {
+    width: 18px;
+    height: 18px;
+    object-fit: contain;
+}
+
+.mobile-device-model {
+    font-size: 12px;
+    color: white;
+    font-weight: 600;
+    margin-bottom: 1px;
+}
+
+.mobile-device-name {
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.mobile-hikvision-block-2 {
+    background-image: url('../assets/images/Frame 1585.svg') !important;
+    background-size: cover !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+    position: relative;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4/3;
+    margin: 0;
+    border-radius: 0;
+    overflow: visible;
+    box-shadow: none;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+}
+
+.mobile-hikvision-buttons {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    right: 20px;
+    display: flex;
+    gap: 10px;
+    z-index: 10;
+}
+
+.mobile-hikvision-btn-details {
+    flex: 1;
+    padding: 12px;
+    border: 1px solid #ddd;
+    background: white;
+    color: #333;
+    border-radius: 25px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.mobile-hikvision-btn-details:hover {
+    background: #f8f9fa;
+    border-color: #bbb;
+}
+
+.mobile-hikvision-btn-connect {
+    flex: 1;
+    padding: 12px;
+    border: 2px solid #000;
+    background: #000;
+    color: white;
+    border-radius: 25px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.mobile-hikvision-btn-connect:hover {
+    background: #333;
+    border-color: #333;
+}
+
+.mobile-ajax-buttons {
+    display: flex !important;
+    gap: 15px !important;
+    justify-content: center !important;
+    width: 100% !important;
+    margin-top: 20px !important;
+}
+
+.mobile-hikvision-block-4 .mobile-ajax-buttons {
+    position: absolute !important;
+    bottom: 20px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    margin-top: 0 !important;
+    z-index: 10 !important;
+}
+
+.mobile-ajax-btn-details {
+    flex: 1;
+    padding: 12px;
+    border: 1px solid #ddd;
+    background: white;
+    color: #333;
+    border-radius: 25px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.mobile-ajax-btn-details:hover {
+    background: #f8f9fa;
+    border-color: #bbb;
+}
+
+.mobile-ajax-btn-connect {
+    flex: 1;
+    padding: 12px;
+    border: 2px solid #000;
+    background: #000;
+    color: white;
+    border-radius: 25px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.mobile-ajax-btn-connect:hover {
+    background: #333;
+    border-color: #333;
+}
+
+.mobile-subscription-block {
+    display: none; 
+    margin: 15px 0;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+    background: #000;
+    color: white;
+    min-height: 240px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.mobile-subscription-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 20px 20px 0 20px;
+    background: #000;
+}
+
+.mobile-subscription-icon {
+    display: flex;
+    align-items: center;
+}
+
+.mobile-check-icon {
+    width: 32px;
+    height: 32px;
+    background: #000;
+    border-radius: 8px;
+    padding: 6px;
+}
+
+.mobile-subscription-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: white;
+    margin: 0;
+}
+
+.mobile-subscription-prices {
+    padding: 20px 20px 30px 20px;
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    justify-content: space-between;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.mobile-price-column {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    flex: 1;
+    box-sizing: border-box;
+    min-width: 0;
+    justify-content: center;
+}
+
+.mobile-price-label {
+    font-size: 15px;
+    color: #ccc;
+    font-weight: 500;
+    margin-bottom: 8px;
+    max-width: 100%;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    line-height: 1.4;
+}
+
+.mobile-price-value {
+    font-size: 22px;
+    color: white;
+    font-weight: 700;
+    max-width: 100%;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    line-height: 1.3;
+}
+
+.mobile-subscription-button-container {
+    padding: 30px 20px 15px;
+}
+
+.mobile-subscription-button {
+    width: 100%;
+    padding: 14px;
+    background: #000;
+    color: #fff;
+    border: 1px solid #fff;
+    border-radius: 25px;
+    font-size: 17px;
+    font-weight: 400;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.mobile-subscription-button:hover {
+    background: #1a1a1a;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+    border-color: #fff;
+}
+
+.mobile-subscription-button:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3), 0 0 20px rgba(76, 172, 38, 0.3);
+}
+
+    .mobile-subscription-button .mobile-arrow-icon {
+        width: 16px;
+        height: 16px;
+        transition: transform 0.3s ease;
+        filter: brightness(0) invert(1);
+    }
+    
+    .mobile-subscription-button:hover .mobile-arrow-icon {
+        transform: translateX(3px);
+    }
+
+.mobile-hikvision-block-4 {
+    background-image: url('../assets/images/Frame 1586.svg') !important;
+    background-size: cover !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+    position: relative;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4/3;
+    margin: 0;
+    border-radius: 0;
+    overflow: visible;
+    box-shadow: none;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+}
+
+.mobile-hikvision-block-5 {
+    background-image: url('../assets/images/5.svg') !important;
+    background-size: 100% 100% !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+    color: white !important;
+    position: relative;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16/9;
+    margin: 0;
+    border-radius: 0;
+    overflow: visible;
+    box-shadow: none;
+    display: none;
+}
+
+.mobile-services-block {
+    display: none; 
+    margin: 12px 8px;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+    background: #1a1a1a;
+    padding: 16px 12px;
+}
+
+.mobile-services-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+
+.mobile-service-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    padding: 14px 8px;
+    text-align: center;
+    min-height: 110px;
+    justify-content: center;
+}
+
+.mobile-service-icon {
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border-radius: 6px;
+    margin-bottom: 2px;
+}
+
+.mobile-icon-img {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+}
+
+.mobile-service-card:nth-child(3) .mobile-icon-img {
+    filter: none;
+    width: 24px;
+    height: 24px;
+}
+
+.mobile-service-text {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 32px;
+}
+
+.mobile-service-title {
+    font-size: 11px;
+    font-weight: 400;
+    color: #ffffff;
+    margin: 0;
+    line-height: 1.3;
+    text-align: center;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+    .mobile-service-subtitle {
+        display: none;
+    }
+
+@media screen and (max-width: 768px) {
+    body {
+        margin: 0;
+        padding: 0;
+    }
+    
+    .mobile-blocks-container {
+        display: block;
+        padding: 10px;
+        margin: 0;
+    }
+    
+    .mobile-hikvision-block-1 {
+        display: block;
+        width: 100%;
+        height: auto;
+        aspect-ratio: 16/9;
+    }
+    
+    .mobile-hikvision-block-2 {
+        display: block;
+        margin: 5px 0;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+    }
+
+    .mobile-hikvision-block-4 {
+        display: block;
+        margin: 5px 0;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+    }
+    
+    .mobile-subscription-block {
+        display: block;
+        margin: 5px 0;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+        background: #000;
+    }
+    
+    .mobile-hikvision-block-5 {
+        display: block;
+    }
+    
+    .mobile-services-block {
+        display: block;
+    }
+}
+
+@media screen and (max-width: 430px) {
+    .mobile-blocks-container {
+        padding: 5px;
+    }
+    
+    .mobile-hikvision-block-1 {
+        margin: 0;
+    }
+    
+    .mobile-hikvision-block-2 {
+        margin: 3px 0;
+        border-radius: 15px;
+    }
+    
+    .mobile-hikvision-block-4 {
+        margin: 3px 0;
+        border-radius: 15px;
+    }
+    
+    .mobile-hikvision-buttons {
+        bottom: 15px;
+        left: 15px;
+        right: 15px;
+        gap: 8px;
+    }
+    
+    .mobile-hikvision-btn-details,
+    .mobile-hikvision-btn-connect,
+    .mobile-ajax-btn-details,
+    .mobile-ajax-btn-connect {
+        padding: 10px;
+        font-size: 13px;
+        border-radius: 20px;
+    }
+    
+    .mobile-subscription-block {
+        margin: 3px 0;
+        border-radius: 15px;
+        min-height: 200px;
+    }
+    
+    .mobile-subscription-header {
+        padding: 15px 15px 0 15px;
+        gap: 10px;
+    }
+    
+    .mobile-check-icon {
+        width: 28px;
+        height: 28px;
+    }
+    
+    .mobile-subscription-title {
+        font-size: 20px;
+    }
+    
+    .mobile-subscription-prices {
+        padding: 15px 15px 20px 15px;
+        gap: 15px;
+    }
+    
+    .mobile-price-label {
+        font-size: 13px;
+        margin-bottom: 6px;
+        line-height: 1.4;
+    }
+    
+    .mobile-price-value {
+        font-size: 18px;
+        line-height: 1.3;
+    }
+    
+    .mobile-subscription-button-container {
+        padding: 25px 15px 12px;
+    }
+    
+    .mobile-subscription-button {
+        padding: 12px;
+        font-size: 15px;
+        gap: 6px;
+    }
+    
+    .mobile-subscription-button .mobile-arrow-icon {
+        width: 14px;
+        height: 14px;
+        filter: brightness(0) invert(1);
+    }
+    
+    .mobile-services-block {
+        margin: 3px 4px;
+        border-radius: 12px;
+        padding: 12px 10px;
+    }
+    
+    .mobile-services-grid {
+        gap: 6px;
+    }
+    
+    .mobile-service-card {
+        padding: 12px 6px;
+        gap: 6px;
+        min-height: 100px;
+        border-radius: 8px;
+    }
+    
+    .mobile-service-icon {
+        width: 32px;
+        height: 32px;
+    }
+    
+    .mobile-icon-img {
+        width: 20px;
+        height: 20px;
+    }
+    
+    .mobile-service-card:nth-child(3) .mobile-icon-img {
+        width: 20px;
+        height: 20px;
+    }
+    
+    .mobile-service-title {
+        font-size: 10px;
+        line-height: 1.25;
+    }
+}
+
+@media screen and (min-width: 430px) and (max-width: 768px) {
+    .mobile-blocks-container {
+        padding: 8px;
+    }
+    
+    .mobile-hikvision-block-1 {
+        margin: 0;
+    }
+    
+    .mobile-hikvision-block-2 {
+        margin: 8px 0;
+        border-radius: 20px;
+    }
+    
+    .mobile-hikvision-block-4 {
+        margin: 8px 0;
+        border-radius: 20px;
+    }
+    
+    .mobile-hikvision-buttons {
+        bottom: 18px;
+        left: 18px;
+        right: 18px;
+        gap: 12px;
+    }
+    
+    .mobile-hikvision-btn-details,
+    .mobile-hikvision-btn-connect,
+    .mobile-ajax-btn-details,
+    .mobile-ajax-btn-connect {
+        padding: 14px;
+        font-size: 15px;
+        border-radius: 25px;
+    }
+    
+    .mobile-subscription-block {
+        margin: 8px 0;
+        border-radius: 20px;
+    }
+    
+    .mobile-services-block {
+        margin: 8px 8px;
+        border-radius: 16px;
+        padding: 18px 14px;
+    }
+    
+    .mobile-services-grid {
+        gap: 10px;
+    }
+    
+    .mobile-service-card {
+        padding: 16px 10px;
+        gap: 10px;
+        min-height: 120px;
+        border-radius: 10px;
+    }
+    
+    .mobile-service-icon {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .mobile-icon-img {
+        width: 26px;
+        height: 26px;
+    }
+    
+    .mobile-service-card:nth-child(3) .mobile-icon-img {
+        width: 26px;
+        height: 26px;
+    }
+    
+    .mobile-service-title {
+        font-size: 12px;
+        line-height: 1.3;
+    }
+}
+
+@media screen and (max-width: 400px) {
+    .mobile-blocks-container {
+        padding: 3px;
+    }
+    
+    .mobile-hikvision-block-1 {
+        margin: 0;
+    }
+    
+    .mobile-hikvision-block-2 {
+        margin: 2px 0;
+        border-radius: 12px;
+    }
+    
+    .mobile-hikvision-block-4 {
+        margin: 2px 0;
+        border-radius: 12px;
+    }
+    
+    .mobile-hikvision-buttons {
+        bottom: 12px;
+        left: 12px;
+        right: 12px;
+        gap: 6px;
+    }
+    
+    .mobile-hikvision-btn-details,
+    .mobile-hikvision-btn-connect,
+    .mobile-ajax-btn-details,
+    .mobile-ajax-btn-connect {
+        padding: 8px;
+        font-size: 12px;
+        border-radius: 18px;
+    }
+    
+    .mobile-subscription-block {
+        margin: 2px 0;
+        border-radius: 12px;
+        min-height: 180px;
+    }
+    
+    .mobile-subscription-header {
+        padding: 12px 12px 0 12px;
+        gap: 8px;
+    }
+    
+    .mobile-check-icon {
+        width: 24px;
+        height: 24px;
+    }
+    
+    .mobile-subscription-title {
+        font-size: 18px;
+    }
+    
+    .mobile-subscription-prices {
+        padding: 12px 12px 15px 12px;
+        gap: 12px;
+    }
+    
+    .mobile-price-label {
+        font-size: 12px;
+        margin-bottom: 4px;
+        line-height: 1.4;
+    }
+    
+    .mobile-price-value {
+        font-size: 16px;
+        line-height: 1.3;
+    }
+    
+    .mobile-subscription-button-container {
+        padding: 20px 12px 10px;
+    }
+    
+    .mobile-subscription-button {
+        padding: 10px;
+        font-size: 14px;
+        gap: 5px;
+    }
+    
+    .mobile-subscription-button .mobile-arrow-icon {
+        width: 12px;
+        height: 12px;
+        filter: brightness(0) invert(1);
+    }
+    
+    .mobile-services-block {
+        margin: 2px 4px;
+        border-radius: 10px;
+        padding: 10px 8px;
+    }
+    
+    .mobile-services-grid {
+        gap: 5px;
+    }
+    
+    .mobile-service-card {
+        padding: 10px 5px;
+        gap: 5px;
+        min-height: 95px;
+        border-radius: 8px;
+    }
+    
+    .mobile-service-icon {
+        width: 30px;
+        height: 30px;
+    }
+    
+    .mobile-icon-img {
+        width: 18px;
+        height: 18px;
+    }
+    
+    .mobile-service-card:nth-child(3) .mobile-icon-img {
+        width: 18px;
+        height: 18px;
+    }
+    
+    .mobile-service-title {
+        font-size: 9px;
+        line-height: 1.2;
+    }
+    
+    .mobile-icon-img {
+        width: 20px;
+        height: 20px;
+    }
+    
+    .mobile-service-title {
+        font-size: 16px;
+    }
+}
+
+.ajax-buttons {
+    display: flex;
+    gap: 15px;
+    margin-top: 20px;
+    justify-content: center;
+}
+
+.ajax-btn-details {
+    padding: 12px 20px;
+    background: rgba(255,255,255,0.9);
+    color: #333;
+    border: none;
+    border-radius: 25px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+.ajax-btn-details:hover {
+    background: white;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+.ajax-btn-connect {
+    padding: 12px 20px;
+    background: #00C851;
+    color: white;
+    border: none;
+    border-radius: 25px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.ajax-btn-connect:hover {
+    background: #00A041;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,200,81,0.3);
+}
+
+@media (max-width: 480px) {
+    .ajax-buttons {
+        gap: 12px;
+        margin-top: 15px;
+    }
+    
+    .ajax-btn-details,
+    .ajax-btn-connect {
+        padding: 10px 16px;
+        font-size: 13px;
+    }
+}
+
+@media (max-width: 360px) {
+    .ajax-buttons {
+        gap: 10px;
+        margin-top: 12px;
+    }
+    
+    .ajax-btn-details,
+    .ajax-btn-connect {
+        padding: 8px 14px;
+        font-size: 12px;
+    }
+}
+

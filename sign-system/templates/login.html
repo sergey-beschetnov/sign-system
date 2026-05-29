@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Вход — ЦОМ</title>
+<style>
+  @font-face{font-family:'Gilroy';src:url('/static/fonts/Gilroy-Regular.ttf');font-weight:400;}
+  @font-face{font-family:'Gilroy';src:url('/static/fonts/Gilroy-Semibold.ttf');font-weight:600;}
+  @font-face{font-family:'Gilroy';src:url('/static/fonts/Gilroy-Bold.ttf');font-weight:700;}
+
+  :root {
+    --bg: #0f0f0f;
+    --surface: #171717;
+    --surface2: #1f1f1f;
+    --border: #272727;
+    --text: #efefef;
+    --text-dim: #5a5a5a;
+    --placeholder: #3a3a3a;
+  }
+
+  :root[data-theme="light"] {
+    --bg: #f0f2f5;
+    --surface: #ffffff;
+    --surface2: #f7f8fa;
+    --border: #e2e5ea;
+    --text: #1a1a1a;
+    --text-dim: #888;
+    --placeholder: #bbb;
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+
+  body{
+    font-family:'Gilroy',sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    transition:background 0.2s, color 0.2s;
+  }
+
+  .wrap{width:100%;max-width:360px;position:relative;}
+
+  /* ── Theme toggle ── */
+  .theme-toggle {
+    position:absolute;
+    top:-48px;
+    right:0;
+    width:34px;height:34px;
+    display:flex;align-items:center;justify-content:center;
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:8px;
+    cursor:pointer;
+    color:var(--text-dim);
+    transition:color 0.2s, border-color 0.2s, background 0.2s;
+  }
+  .theme-toggle:hover{color:var(--text);border-color:#4CAC26;}
+
+  .logo{display:flex;align-items:center;gap:12px;margin-bottom:36px;justify-content:center;}
+  .logo img{height:36px;width:auto;}
+  .logo-name{font-size:12px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--text);}
+
+  .card{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:28px;
+    transition:background 0.2s, border-color 0.2s;
+  }
+
+  .card-title{font-size:18px;font-weight:700;margin-bottom:4px;color:var(--text);}
+  .card-sub{font-size:13px;color:var(--text-dim);margin-bottom:24px;}
+
+  .form-group{display:flex;flex-direction:column;gap:6px;margin-bottom:14px;}
+  label{font-size:10px;font-weight:600;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.08em;}
+
+  input{
+    padding:12px 14px;
+    background:var(--surface2);
+    border:1px solid var(--border);
+    border-radius:6px;
+    color:var(--text);
+    font-size:16px;
+    font-family:'Gilroy',sans-serif;
+    outline:none;
+    transition:border-color 0.2s, background 0.2s;
+    width:100%;
+  }
+  input:focus{border-color:#4CAC26;}
+  input::placeholder{color:var(--placeholder);}
+
+  .code-input{
+    letter-spacing:0.3em;
+    font-size:22px;
+    font-weight:700;
+    text-align:center;
+  }
+
+  .btn{
+    width:100%;
+    padding:13px;
+    border:none;
+    border-radius:6px;
+    font-family:'Gilroy',sans-serif;
+    font-size:12px;
+    font-weight:700;
+    cursor:pointer;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    transition:background 0.2s;
+    margin-top:6px;
+  }
+  .btn-primary{background:#4CAC26;color:#fff;}
+  .btn-primary:hover{background:#3a8f1e;}
+  .btn-primary:disabled{opacity:0.3;cursor:not-allowed;}
+
+  .error{
+    background:rgba(184,50,50,0.1);
+    border:1px solid rgba(184,50,50,0.3);
+    border-radius:5px;
+    padding:10px 13px;
+    font-size:12px;
+    color:#e06060;
+    margin-bottom:14px;
+    display:none;
+  }
+  .error.show{display:block;}
+
+  .hint{font-size:11px;color:var(--text-dim);text-align:center;margin-top:14px;}
+  .hint a{color:#4CAC26;cursor:pointer;text-decoration:none;}
+
+  .timer{font-size:11px;color:var(--text-dim);text-align:center;margin-top:10px;}
+
+  #stepPhone{display:block;}
+  #stepCode{display:none;}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Сменить тему">
+    <svg id="themeIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+    </svg>
+  </button>
+
+  <div class="logo">
+    <img src="/static/logo.png" alt="ЦОМ">
+    <div class="logo-name">Центр Охранного Мониторинга</div>
+  </div>
+
+  <div class="card">
+
+    <!-- Шаг 1: телефон -->
+    <div id="stepPhone">
+      <div class="card-title">Вход</div>
+      <div class="card-sub">Введите номер телефона для получения кода</div>
+
+      <div class="error" id="errPhone"></div>
+
+      <div class="form-group">
+        <label>Номер телефона</label>
+        <input type="tel" id="phoneInput" placeholder="+7 (777) 000-00-00"
+               autocomplete="tel" inputmode="tel" value="+7 ">
+      </div>
+
+      <button class="btn btn-primary" id="btnSend" onclick="sendCode()">
+        Получить код
+      </button>
+    </div>
+
+    <!-- Шаг 2: код -->
+    <div id="stepCode">
+      <div class="card-title">Введите код</div>
+      <div class="card-sub" id="codeSub">Код отправлен на </div>
+
+      <div class="error" id="errCode"></div>
+
+      <div class="form-group">
+        <label>4-значный код</label>
+        <input type="text" id="codeInput" class="code-input"
+               placeholder="——" maxlength="4"
+               inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code">
+      </div>
+
+      <button class="btn btn-primary" id="btnVerify" onclick="verifyCode()">
+        Войти
+      </button>
+
+      <div class="timer" id="timerWrap">
+        Повторный код через <span id="timerVal">60</span> с
+      </div>
+      <div class="hint" id="resendWrap" style="display:none">
+        <a onclick="backToPhone()">Отправить ещё раз</a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+let phoneVal = '';
+let timerInterval = null;
+
+function showError(id, msg) {
+  const el = document.getElementById(id);
+  el.textContent = msg;
+  el.classList.add('show');
+}
+function clearError(id) {
+  document.getElementById(id).classList.remove('show');
+}
+
+async function sendCode() {
+  clearError('errPhone');
+  const phone = document.getElementById('phoneInput').value.trim();
+  if (!phone) { showError('errPhone', 'Введите номер телефона'); return; }
+
+  const btn = document.getElementById('btnSend');
+  btn.disabled = true; btn.textContent = 'Отправляем...';
+
+  try {
+    const res = await fetch('/admin/login/send', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({phone}),
+    });
+    const data = await res.json();
+    if (!res.ok) { showError('errPhone', data.detail || 'Ошибка'); return; }
+
+    phoneVal = phone;
+    let subText = 'Код отправлен на ' + phone;
+    if (data.debug_code) {
+      subText += ` — (SMS не подключён, код: ${data.debug_code})`;
+      document.getElementById('codeInput').value = data.debug_code;
+    }
+    document.getElementById('codeSub').textContent = subText;
+    document.getElementById('stepPhone').style.display = 'none';
+    document.getElementById('stepCode').style.display = 'block';
+    document.getElementById('codeInput').focus();
+    startTimer();
+  } catch(e) {
+    showError('errPhone', 'Ошибка соединения');
+  } finally {
+    btn.disabled = false; btn.textContent = 'Получить код';
+  }
+}
+
+async function verifyCode() {
+  clearError('errCode');
+  const code = document.getElementById('codeInput').value.trim();
+  if (code.length < 4) { showError('errCode', 'Введите 4-значный код'); return; }
+
+  const btn = document.getElementById('btnVerify');
+  btn.disabled = true; btn.textContent = 'Проверяем...';
+
+  try {
+    const res = await fetch('/admin/login/verify', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({phone: phoneVal, code}),
+    });
+    const data = await res.json();
+    if (!res.ok) { showError('errCode', data.detail || 'Неверный код'); return; }
+    window.location.href = '/admin';
+  } catch(e) {
+    showError('errCode', 'Ошибка соединения');
+  } finally {
+    btn.disabled = false; btn.textContent = 'Войти';
+  }
+}
+
+function startTimer() {
+  let sec = 60;
+  document.getElementById('timerWrap').style.display = 'block';
+  document.getElementById('resendWrap').style.display = 'none';
+  timerInterval = setInterval(() => {
+    sec--;
+    document.getElementById('timerVal').textContent = sec;
+    if (sec <= 0) {
+      clearInterval(timerInterval);
+      document.getElementById('timerWrap').style.display = 'none';
+      document.getElementById('resendWrap').style.display = 'block';
+    }
+  }, 1000);
+}
+
+function backToPhone() {
+  clearInterval(timerInterval);
+  clearError('errCode');
+  document.getElementById('codeInput').value = '';
+  document.getElementById('stepCode').style.display = 'none';
+  document.getElementById('stepPhone').style.display = 'block';
+}
+
+// Маска телефона
+const phoneInput = document.getElementById('phoneInput');
+phoneInput.addEventListener('input', e => {
+  let raw = e.target.value.replace(/\D/g, '');
+  if (!raw.startsWith('7')) raw = '7' + raw.replace(/^7/, '');
+  raw = raw.slice(0, 11);
+  let out = '+7';
+  if (raw.length > 1) out += ' (' + raw.slice(1, 4);
+  if (raw.length >= 4) out += ') ' + raw.slice(4, 7);
+  if (raw.length >= 7) out += '-' + raw.slice(7, 9);
+  if (raw.length >= 9) out += '-' + raw.slice(9, 11);
+  e.target.value = out;
+});
+phoneInput.addEventListener('keydown', e => {
+  if (e.key === 'Backspace' && phoneInput.value === '+7 ') e.preventDefault();
+});
+phoneInput.addEventListener('focus', () => {
+  if (!phoneInput.value) phoneInput.value = '+7 ';
+});
+
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Enter') return;
+  if (document.getElementById('stepPhone').style.display !== 'none') sendCode();
+  else verifyCode();
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('codeInput').addEventListener('input', e => {
+    if (e.target.value.replace(/\D/g,'').length === 4) verifyCode();
+  });
+});
+
+// ── Theme toggle (shared with admin panel) ──
+const MOON = `<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>`;
+const SUN  = `<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>`;
+
+function applyTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  document.getElementById('themeIcon').innerHTML = theme === 'light' ? MOON : SUN;
+}
+
+function toggleTheme() {
+  const next = (document.documentElement.getAttribute('data-theme') || 'dark') === 'dark' ? 'light' : 'dark';
+  applyTheme(next);
+  localStorage.setItem('admin-theme', next);
+}
+
+(function () {
+  applyTheme(localStorage.getItem('admin-theme') || 'dark');
+})();
+</script>
+</body>
+</html>

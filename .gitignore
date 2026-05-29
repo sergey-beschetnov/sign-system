@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+env/
+
+# Данные пользователей (договоры, подписи, токены)
+sign-system/data/
+data/
+sign-system/uploads/
+sign-system/signed/
+sign-system/tokens.json
+
+# Конфиг с телефонами (локальный)
+sign-system/config.json
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
