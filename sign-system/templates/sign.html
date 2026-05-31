@@ -953,7 +953,7 @@
         <input type="text" id="signerName" placeholder="Иванов Иван Иванович"
                value="{{CLIENT_NAME}}" autocomplete="name">
 
-        <p class="sig-label">Нарисуйте подпись в поле ниже:</p>
+        <p class="sig-label">Поставьте подпись в поле ниже:</p>
         <div class="canvas-wrap" id="canvasWrap">
           <canvas id="sigCanvas"></canvas>
           <div class="canvas-hint" id="canvasHint">
@@ -1244,7 +1244,7 @@ function showScreen(n) {
 
 async function submitSignature() {
   const name = document.getElementById('signerName').value.trim();
-  if (!hasSig) { showToast('Нарисуйте подпись'); return; }
+  if (!hasSig) { showToast('Поставьте подпись'); return; }
   if (name.length < 2) { showToast('Введите ФИО'); return; }
 
   const sigB64 = canvas.toDataURL('image/png');
