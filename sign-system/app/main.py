@@ -18,18 +18,28 @@ import uvicorn
 from .pdf_utils import embed_signature_on_pdf
 from .storage import TokenStorage
 from .auth import (
-    is_allowed, generate_otp, verify_otp,
+    is_allowed, generate_otp, verify_otp, check_otp_rate_limit,
     create_session, get_session, delete_session, send_sms,
     load_admins, save_admins, get_admin, clean_phone,
 )
 
+MAX_PDF_MB = 20
+MAX_SIG_B64_BYTES = 3 * 1024 * 1024  # 3 MB base64 ≈ 2.25 MB PNG
+
+_UUID_RE = __import__("re").compile(r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$")
+
+def _html_escape(s: str) -> str:
+    return (s.replace("&", "&amp;").replace("<", "&lt;")
+             .replace(">", "&gt;").replace('"', "&quot;").replace("'", "&#x27;"))
+
 app = FastAPI(title="Sign System - ЦОМ")
 
+# CORS ограничен — только запросы с того же сервера
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_origins=[],  # same-origin only
+    allow_methods=["GET", "POST", "DELETE", "PATCH"],
+    allow_headers=["Content-Type"],
 )
 
 # ─── Middleware: защита /admin/* ──────────────────────────────────────────────
@@ -84,9 +94,10 @@ async def login_page(request: Request):
 async def login_send(req: LoginRequest):
     if not is_allowed(req.phone):
         raise HTTPException(403, "Номер не найден в списке администраторов")
+    if not check_otp_rate_limit(req.phone):
+        raise HTTPException(429, "Слишком много запросов. Попробуйте через 10 минут.")
     code = generate_otp(req.phone)
     sms_sent = send_sms(req.phone, code)
-    # DEBUG: пока SMS не подключён — возвращаем код в ответе
     if not sms_sent:
         return JSONResponse({"ok": True, "debug_code": code})
     return JSONResponse({"ok": True})
@@ -175,8 +186,14 @@ async def upload_contract(
     contract_number: str = Form(...),
 ):
     """Загружает PDF и возвращает ссылку для клиента"""
-    if not file.filename.endswith(".pdf"):
+    if not (file.filename or "").lower().endswith(".pdf"):
         raise HTTPException(400, "Только PDF файлы")
+
+    content = await file.read()
+    if len(content) > MAX_PDF_MB * 1024 * 1024:
+        raise HTTPException(413, f"Файл превышает {MAX_PDF_MB} МБ")
+    if not content.startswith(b"%PDF"):
+        raise HTTPException(400, "Файл не является корректным PDF")
 
     sid = request.cookies.get("admin_session", "")
     session = get_session(sid) or {}
@@ -185,7 +202,7 @@ async def upload_contract(
     # Сохраняем PDF
     file_id = str(uuid.uuid4())
     pdf_path = UPLOADS_DIR / f"{file_id}.pdf"
-    pdf_path.write_bytes(await file.read())
+    pdf_path.write_bytes(content)
 
     # Создаём токен
     token = str(uuid.uuid4())
@@ -256,6 +273,31 @@ async def export_contracts(request: Request):
         content=output.getvalue().encode("utf-8-sig"),
         media_type="text/csv",
         headers={"Content-Disposition": "attachment; filename=contracts.csv"},
+    )
+
+
+@app.get("/admin/backup-download")
+async def backup_download(request: Request):
+    """Скачать ZIP-архив со всеми данными: токены + подписанные PDF."""
+    _require_superadmin(request)
+    import zipfile, io
+    from fastapi.responses import Response as FastResponse
+
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as zf:
+        if storage.path.exists():
+            zf.write(storage.path, "tokens.json")
+        for f in sorted(SIGNED_DIR.glob("*.pdf")):
+            zf.write(f, f"signed/{f.name}")
+        for f in sorted((storage.backup_dir).glob("tokens_*.json")):
+            zf.write(f, f"backup/{f.name}")
+
+    ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+    buf.seek(0)
+    return FastResponse(
+        content=buf.read(),
+        media_type="application/zip",
+        headers={"Content-Disposition": f"attachment; filename=backup_com_{ts}.zip"},
     )
 
 
@@ -339,15 +381,19 @@ async def sign_page(token: str):
 
     html_path = BASE_DIR / "templates" / "sign.html"
     html = html_path.read_text(encoding="utf-8")
-    html = html.replace("{{CLIENT_NAME}}", data["client_name"])
-    html = html.replace("{{CONTRACT_NUMBER}}", data["contract_number"])
-    html = html.replace("{{TOKEN}}", token)
+    html = html.replace("{{CLIENT_NAME}}", _html_escape(data["client_name"]))
+    html = html.replace("{{CONTRACT_NUMBER}}", _html_escape(data["contract_number"]))
+    html = html.replace("{{TOKEN}}", _html_escape(token))
     html = html.replace("{{PDF_URL}}", f"/uploads_view/{data['file_id']}.pdf")
     return HTMLResponse(html)
 
 
 @app.get("/uploads_view/{filename}")
 async def serve_upload(filename: str):
+    # Разрешаем только формат {uuid}.pdf — защита от path traversal
+    import re
+    if not re.fullmatch(r"[0-9a-f\-]{36}\.pdf", filename):
+        raise HTTPException(404)
     path = UPLOADS_DIR / filename
     if not path.exists():
         raise HTTPException(404)
@@ -358,6 +404,9 @@ async def serve_upload(filename: str):
 
 @app.post("/sign/submit")
 async def submit_signature(req: SignRequest):
+    if len(req.signature_b64) > MAX_SIG_B64_BYTES:
+        raise HTTPException(413, "Подпись слишком большая")
+
     data = storage.get(req.token)
     if not data:
         raise HTTPException(404, "Токен не найден")

@@ -4,10 +4,13 @@ import secrets
 from datetime import datetime, timedelta
 from pathlib import Path
 
-_otp_store: dict = {}   # phone -> {code, expires}
-_sessions: dict = {}    # session_id -> {phone, name, role, expires}
+_otp_store: dict = {}    # phone -> {code, expires}
+_sessions: dict = {}     # session_id -> {phone, name, role, expires}
+_otp_attempts: dict = {} # phone -> {count, window_start}
 
 OTP_TTL_MIN = 5
+OTP_RATE_LIMIT = 5        # максимум запросов OTP
+OTP_RATE_WINDOW_MIN = 10  # за 10 минут
 SESSION_TTL_H = 24
 CONFIG_PATH = Path(__file__).parent.parent / "config.json"
 
@@ -71,6 +74,20 @@ def get_admin(phone: str) -> dict | None:
 
 def is_allowed(phone: str) -> bool:
     return get_admin(phone) is not None
+
+
+def check_otp_rate_limit(phone: str) -> bool:
+    """Возвращает True если лимит не превышен, False если заблокирован."""
+    key = clean_phone(phone)
+    now = datetime.now()
+    entry = _otp_attempts.get(key)
+    if entry and (now - entry["window_start"]).total_seconds() < OTP_RATE_WINDOW_MIN * 60:
+        if entry["count"] >= OTP_RATE_LIMIT:
+            return False
+        entry["count"] += 1
+    else:
+        _otp_attempts[key] = {"count": 1, "window_start": now}
+    return True
 
 
 def generate_otp(phone: str) -> str:

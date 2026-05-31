@@ -921,6 +921,10 @@
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
         Экспорт CSV
       </a>
+      <a id="backupBtn" href="/admin/backup-download" class="btn-export" style="display:none;border-color:rgba(76,172,38,0.4);color:var(--green);" title="Скачать полный архив: договоры + токены">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Резервная копия
+      </a>
     </div>
     <div class="table-wrap">
       <div class="loading" id="tableLoading">Загрузка...</div>
@@ -1218,6 +1222,7 @@ function closeUsersModal(e) {
 function initSuperAdmin() {
   if (!IS_SUPERADMIN) return;
   document.getElementById('exportBtn').style.display = 'inline-flex';
+  document.getElementById('backupBtn').style.display = 'inline-flex';
   document.getElementById('pdUsers').style.display = 'flex';
   document.getElementById('pdSep').style.display = 'block';
   const nameEl = document.getElementById('adminName');
