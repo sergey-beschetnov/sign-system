@@ -656,18 +656,35 @@
   }
   .add-user-form select:focus { border-color: var(--green); }
 
+  .act-cell {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    white-space: nowrap;
+  }
+  .act-links { display: flex; align-items: center; gap: 10px; }
+  .act-sep {
+    width: 1px;
+    height: 14px;
+    background: var(--border);
+    margin: 0 10px;
+    flex-shrink: 0;
+  }
   .btn-del-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
     background: none;
-    border: none;
+    border: 1px solid transparent;
+    border-radius: 5px;
     cursor: pointer;
     color: var(--text-dim);
-    padding: 3px 6px;
-    border-radius: 4px;
-    transition: color 0.2s, background 0.2s;
-    line-height: 1;
-    font-size: 14px;
+    transition: color 0.2s, background 0.2s, border-color 0.2s;
+    flex-shrink: 0;
   }
-  .btn-del-row:hover { color: #c05050; background: rgba(180,50,50,0.08); }
+  .btn-del-row:hover { color: #c05050; background: rgba(180,50,50,0.08); border-color: rgba(180,50,50,0.25); }
 
   .stats-strip {
     display: grid;
@@ -1015,19 +1032,22 @@ async function loadContracts() {
       const badge = signed
         ? '<span class="badge badge-signed">Подписан</span>'
         : '<span class="badge badge-pending">Ожидает</span>';
+      const trashIcon = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>`;
       const delBtn = IS_SUPERADMIN
-        ? `<button class="btn-del-row" title="Удалить договор" onclick="deleteContract('${token}')">🗑</button>`
+        ? `<span class="act-sep"></span><button class="btn-del-row" title="Удалить договор" onclick="deleteContract('${token}')">${trashIcon}</button>`
         : '';
       const actions = signed
-        ? `<a href="/view/${token}" target="_blank" style="color:var(--green);font-size:12px;font-weight:600;">Открыть</a>
-           &nbsp;<a href="/download/${token}" style="color:var(--text-dim);font-size:12px;">↓ Скачать</a>${delBtn}`
-        : `<button class="btn-link" onclick="copyToClip('${signUrl}')">Скопировать ссылку</button>${delBtn}`;
+        ? `<div class="act-cell"><div class="act-links"><a href="/view/${token}" target="_blank" style="color:var(--green);font-size:12px;font-weight:600;text-decoration:none;">Открыть</a><a href="/download/${token}" style="color:var(--text-dim);font-size:12px;text-decoration:none;">↓ Скачать</a></div>${delBtn}</div>`
+        : `<div class="act-cell"><button class="btn-link" onclick="copyToClip('${signUrl}')">Скопировать ссылку</button>${delBtn}</div>`;
       const createdBy = d.created_by
-        ? `<div style="font-size:10px;color:var(--text-dim);margin-top:2px;letter-spacing:0.02em;">${d.created_by}</div>`
+        ? `<div style="display:inline-flex;align-items:center;gap:3px;margin-top:4px;padding:2px 6px;background:var(--surface2);border:1px solid var(--border);border-radius:4px;font-size:10px;color:var(--text-dim);letter-spacing:0.03em;">
+             <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+             ${d.created_by}
+           </div>`
         : '';
       return `<tr>
         <td><b>${d.contract_number || '—'}</b></td>
-        <td>${d.client_name || '—'}${createdBy}</td>
+        <td><div>${d.client_name || '—'}</div>${createdBy}</td>
         <td>${d.client_phone || '—'}</td>
         <td style="color:var(--text-dim)">${created}</td>
         <td>${badge}</td>
