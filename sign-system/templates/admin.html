@@ -998,7 +998,7 @@ function copyLink() {
 const IS_SUPERADMIN = '{{ADMIN_ROLE}}' === 'superadmin';
 const MY_PHONE = '{{ADMIN_PHONE}}';
 
-// Инициализация аватара
+// Инициализация профиля
 (function() {
   const name = '{{ADMIN_NAME}}';
   if (name) document.getElementById('adminAvatar').textContent = name.charAt(0).toUpperCase();
@@ -1099,7 +1099,8 @@ function initSuperAdmin() {
   document.getElementById('pdUsers').style.display = 'flex';
   document.getElementById('pdSep').style.display = 'block';
   const nameEl = document.getElementById('adminName');
-  nameEl.innerHTML += '<span class="role-badge superadmin">★ Суперадмин</span>';
+  const myLabel = '{{ADMIN_POSITION}}' || '★ Суперадмин';
+  nameEl.innerHTML += `<span class="role-badge superadmin">${myLabel}</span>`;
 }
 
 async function loadUsers() {
@@ -1107,9 +1108,10 @@ async function loadUsers() {
   if (!res.ok) return;
   const users = await res.json();
   document.getElementById('usersTbody').innerHTML = users.map(u => {
+    const roleLabel = u.position || (u.role === 'superadmin' ? '★ Суперадмин' : 'Администратор');
     const roleBadge = u.role === 'superadmin'
-      ? '<span class="role-badge superadmin">★ Суперадмин</span>'
-      : '<span class="role-badge admin">Администратор</span>';
+      ? `<span class="role-badge superadmin">${roleLabel}</span>`
+      : `<span class="role-badge admin">${roleLabel}</span>`;
     const isSelf = u.phone === MY_PHONE;
     const delBtn = isSelf
       ? '<span style="color:var(--text-dim);font-size:11px;font-style:italic;">вы</span>'

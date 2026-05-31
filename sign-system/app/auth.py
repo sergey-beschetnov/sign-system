@@ -43,6 +43,7 @@ def load_admins() -> list[dict]:
                 "phone": clean_phone(a["phone"]),
                 "name": a.get("name", "Администратор"),
                 "role": a.get("role", "admin"),
+                "position": a.get("position", ""),
             }
             for a in cfg["admins"]
         ]
@@ -102,6 +103,7 @@ def create_session(phone: str) -> str:
         "phone": clean_phone(phone),
         "name": admin.get("name", "Администратор"),
         "role": admin.get("role", "admin"),
+        "position": admin.get("position", ""),
         "expires": datetime.now() + timedelta(hours=SESSION_TTL_H),
     }
     return sid

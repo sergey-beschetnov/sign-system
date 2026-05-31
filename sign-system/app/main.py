@@ -157,10 +157,12 @@ async def admin_page(request: Request):
     phone = session.get("phone", "")
     name = session.get("name", "Администратор")
     role = session.get("role", "admin")
+    position = session.get("position", "")
     html = (BASE_DIR / "templates" / "admin.html").read_text(encoding="utf-8")
     html = html.replace("{{ADMIN_PHONE}}", phone)
     html = html.replace("{{ADMIN_NAME}}", name)
     html = html.replace("{{ADMIN_ROLE}}", role)
+    html = html.replace("{{ADMIN_POSITION}}", position)
     return HTMLResponse(html)
 
 
