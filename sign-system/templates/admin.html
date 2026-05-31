@@ -848,6 +848,7 @@
             <th>Договор</th>
             <th>Клиент</th>
             <th>Телефон</th>
+            <th>Создал</th>
             <th>Создан</th>
             <th>Статус</th>
             <th>Действия</th>
@@ -1039,16 +1040,11 @@ async function loadContracts() {
       const actions = signed
         ? `<div class="act-cell"><div class="act-links"><a href="/view/${token}" target="_blank" style="color:var(--green);font-size:12px;font-weight:600;text-decoration:none;">Открыть</a><a href="/download/${token}" style="color:var(--text-dim);font-size:12px;text-decoration:none;">↓ Скачать</a></div>${delBtn}</div>`
         : `<div class="act-cell"><button class="btn-link" onclick="copyToClip('${signUrl}')">Скопировать ссылку</button>${delBtn}</div>`;
-      const createdBy = d.created_by
-        ? `<div style="display:inline-flex;align-items:center;gap:3px;margin-top:4px;padding:2px 6px;background:var(--surface2);border:1px solid var(--border);border-radius:4px;font-size:10px;color:var(--text-dim);letter-spacing:0.03em;">
-             <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-             ${d.created_by}
-           </div>`
-        : '';
       return `<tr>
         <td><b>${d.contract_number || '—'}</b></td>
-        <td><div>${d.client_name || '—'}</div>${createdBy}</td>
+        <td>${d.client_name || '—'}</td>
         <td>${d.client_phone || '—'}</td>
+        <td style="color:var(--text-dim);font-size:12px;">${d.created_by || '<span style="color:var(--border)">—</span>'}</td>
         <td style="color:var(--text-dim)">${created}</td>
         <td>${badge}</td>
         <td>${actions}</td>
