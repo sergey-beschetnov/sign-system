@@ -20,6 +20,7 @@ from .storage import TokenStorage
 from .auth import (
     is_allowed, generate_otp, verify_otp,
     create_session, get_session, delete_session, send_sms,
+    load_admins, save_admins, get_admin, clean_phone,
 )
 
 app = FastAPI(title="Sign System - ЦОМ")
@@ -134,18 +135,38 @@ class CreateLinkRequest(BaseModel):
 
 # ─── Admin: загрузить PDF и создать ссылку ────────────────────────────────────
 
+def _current_session(request: Request) -> dict:
+    sid = request.cookies.get("admin_session", "")
+    session = get_session(sid)
+    if not session:
+        raise HTTPException(401, "Не авторизован")
+    return session
+
+
+def _require_superadmin(request: Request) -> dict:
+    session = _current_session(request)
+    if session.get("role") != "superadmin":
+        raise HTTPException(403, "Требуются права суперадминистратора")
+    return session
+
+
 @app.get("/admin", response_class=HTMLResponse)
 async def admin_page(request: Request):
     sid = request.cookies.get("admin_session", "")
     session = get_session(sid) or {}
     phone = session.get("phone", "")
+    name = session.get("name", "Администратор")
+    role = session.get("role", "admin")
     html = (BASE_DIR / "templates" / "admin.html").read_text(encoding="utf-8")
     html = html.replace("{{ADMIN_PHONE}}", phone)
+    html = html.replace("{{ADMIN_NAME}}", name)
+    html = html.replace("{{ADMIN_ROLE}}", role)
     return HTMLResponse(html)
 
 
 @app.post("/admin/upload")
 async def upload_contract(
+    request: Request,
     file: UploadFile = File(...),
     client_name: str = Form(...),
     client_phone: str = Form(...),
@@ -154,6 +175,10 @@ async def upload_contract(
     """Загружает PDF и возвращает ссылку для клиента"""
     if not file.filename.endswith(".pdf"):
         raise HTTPException(400, "Только PDF файлы")
+
+    sid = request.cookies.get("admin_session", "")
+    session = get_session(sid) or {}
+    created_by = session.get("name", "")
 
     # Сохраняем PDF
     file_id = str(uuid.uuid4())
@@ -169,6 +194,7 @@ async def upload_contract(
         "client_name": client_name,
         "client_phone": client_phone,
         "contract_number": contract_number,
+        "created_by": created_by,
         "created_at": datetime.now().isoformat(),
         "expires_at": expires_at,
         "signed": False,
@@ -184,6 +210,111 @@ async def upload_contract(
 @app.get("/admin/contracts")
 async def list_contracts():
     return JSONResponse(storage.all())
+
+
+@app.delete("/admin/contracts/{token}")
+async def delete_contract(token: str, request: Request):
+    _require_superadmin(request)
+    data = storage.get(token)
+    if not data:
+        raise HTTPException(404, "Договор не найден")
+    file_id = data.get("file_id", "")
+    for f in [
+        UPLOADS_DIR / f"{file_id}.pdf",
+        UPLOADS_DIR / f"{file_id}_sig.png",
+        SIGNED_DIR / f"{file_id}_signed.pdf",
+    ]:
+        if f.exists():
+            f.unlink()
+    storage.delete(token)
+    return JSONResponse({"ok": True})
+
+
+@app.get("/admin/export")
+async def export_contracts(request: Request):
+    _require_superadmin(request)
+    import csv, io
+    from fastapi.responses import Response as FastResponse
+    contracts = storage.all()
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow(["Договор", "Клиент", "Телефон", "Создал", "Создан", "Статус", "Дата подписи", "Подписант"])
+    for _, d in contracts.items():
+        writer.writerow([
+            d.get("contract_number", ""),
+            d.get("client_name", ""),
+            d.get("client_phone", ""),
+            d.get("created_by", ""),
+            d.get("created_at", "")[:10],
+            "Подписан" if d.get("signed") else "Ожидает",
+            d.get("signed_at", "")[:10] if d.get("signed") else "",
+            d.get("signer_name", "") if d.get("signed") else "",
+        ])
+    return FastResponse(
+        content=output.getvalue().encode("utf-8-sig"),
+        media_type="text/csv",
+        headers={"Content-Disposition": "attachment; filename=contracts.csv"},
+    )
+
+
+# ─── Управление пользователями (суперадмин) ───────────────────────────────────
+
+class AdminUserRequest(BaseModel):
+    phone: str
+    name: str
+    role: str = "admin"
+
+
+@app.get("/admin/users")
+async def list_users(request: Request):
+    _require_superadmin(request)
+    return JSONResponse(load_admins())
+
+
+@app.post("/admin/users")
+async def add_user(req: AdminUserRequest, request: Request):
+    _require_superadmin(request)
+    if req.role not in ("admin", "superadmin"):
+        raise HTTPException(400, "Недопустимая роль")
+    admins = load_admins()
+    phone = clean_phone(req.phone)
+    if not phone or len(phone) < 5:
+        raise HTTPException(400, "Некорректный номер телефона")
+    if any(a["phone"] == phone for a in admins):
+        raise HTTPException(400, "Пользователь с таким номером уже существует")
+    admins.append({"phone": phone, "name": req.name.strip(), "role": req.role})
+    save_admins(admins)
+    return JSONResponse({"ok": True})
+
+
+@app.delete("/admin/users/{phone}")
+async def delete_user(phone: str, request: Request):
+    session = _require_superadmin(request)
+    target = clean_phone(phone)
+    if target == session.get("phone"):
+        raise HTTPException(400, "Нельзя удалить собственный аккаунт")
+    admins = load_admins()
+    new_admins = [a for a in admins if a["phone"] != target]
+    if len(new_admins) == len(admins):
+        raise HTTPException(404, "Пользователь не найден")
+    save_admins(new_admins)
+    return JSONResponse({"ok": True})
+
+
+@app.patch("/admin/users/{phone}")
+async def update_user(phone: str, req: AdminUserRequest, request: Request):
+    _require_superadmin(request)
+    target = clean_phone(phone)
+    admins = load_admins()
+    for a in admins:
+        if a["phone"] == target:
+            if req.name:
+                a["name"] = req.name.strip()
+            if req.role in ("admin", "superadmin"):
+                a["role"] = req.role
+            save_admins(admins)
+            return JSONResponse({"ok": True})
+    raise HTTPException(404, "Пользователь не найден")
 
 
 # ─── Клиентская страница подписания ──────────────────────────────────────────

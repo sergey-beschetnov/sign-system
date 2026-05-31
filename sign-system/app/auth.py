@@ -5,37 +5,76 @@ from datetime import datetime, timedelta
 from pathlib import Path
 
 _otp_store: dict = {}   # phone -> {code, expires}
-_sessions: dict = {}    # session_id -> {phone, expires}
+_sessions: dict = {}    # session_id -> {phone, name, role, expires}
 
 OTP_TTL_MIN = 5
 SESSION_TTL_H = 24
 CONFIG_PATH = Path(__file__).parent.parent / "config.json"
 
 
-def load_allowed_phones() -> list[str]:
-    if not CONFIG_PATH.exists():
-        return []
-    try:
-        data = json.loads(CONFIG_PATH.read_text(encoding="utf-8"))
-        return [_clean(p) for p in data.get("admin_phones", [])]
-    except Exception:
-        return []
-
-
-def _clean(phone: str) -> str:
+def clean_phone(phone: str) -> str:
     s = phone.strip().replace(" ", "").replace("-", "").replace("(", "").replace(")", "")
     if s and not s.startswith("+"):
         s = "+" + s
     return s
 
+_clean = clean_phone  # internal alias
+
+
+def _load_config() -> dict:
+    if not CONFIG_PATH.exists():
+        return {}
+    try:
+        return json.loads(CONFIG_PATH.read_text(encoding="utf-8"))
+    except Exception:
+        return {}
+
+
+def _save_config(data: dict):
+    CONFIG_PATH.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+
+
+def load_admins() -> list[dict]:
+    """Load admins from config.json. Supports both new {admins:[...]} and legacy {admin_phones:[...]}."""
+    cfg = _load_config()
+    if "admins" in cfg:
+        return [
+            {
+                "phone": clean_phone(a["phone"]),
+                "name": a.get("name", "Администратор"),
+                "role": a.get("role", "admin"),
+            }
+            for a in cfg["admins"]
+        ]
+    # Legacy format
+    return [
+        {"phone": clean_phone(p), "name": "Администратор", "role": "admin"}
+        for p in cfg.get("admin_phones", [])
+    ]
+
+
+def save_admins(admins: list[dict]):
+    cfg = _load_config()
+    cfg["admins"] = admins
+    cfg.pop("admin_phones", None)
+    _save_config(cfg)
+
+
+def get_admin(phone: str) -> dict | None:
+    key = clean_phone(phone)
+    for a in load_admins():
+        if a["phone"] == key:
+            return a
+    return None
+
 
 def is_allowed(phone: str) -> bool:
-    return _clean(phone) in load_allowed_phones()
+    return get_admin(phone) is not None
 
 
 def generate_otp(phone: str) -> str:
     code = str(random.randint(1000, 9999))
-    _otp_store[_clean(phone)] = {
+    _otp_store[clean_phone(phone)] = {
         "code": code,
         "expires": datetime.now() + timedelta(minutes=OTP_TTL_MIN),
     }
@@ -43,7 +82,7 @@ def generate_otp(phone: str) -> str:
 
 
 def verify_otp(phone: str, code: str) -> bool:
-    key = _clean(phone)
+    key = clean_phone(phone)
     entry = _otp_store.get(key)
     if not entry:
         return False
@@ -58,8 +97,11 @@ def verify_otp(phone: str, code: str) -> bool:
 
 def create_session(phone: str) -> str:
     sid = secrets.token_urlsafe(32)
+    admin = get_admin(phone) or {}
     _sessions[sid] = {
-        "phone": _clean(phone),
+        "phone": clean_phone(phone),
+        "name": admin.get("name", "Администратор"),
+        "role": admin.get("role", "admin"),
         "expires": datetime.now() + timedelta(hours=SESSION_TTL_H),
     }
     return sid
@@ -82,17 +124,11 @@ def delete_session(sid: str):
 
 
 def _load_smsc_credentials() -> tuple[str, str] | None:
-    """Читает логин и пароль smsc.ru из config.json."""
-    if not CONFIG_PATH.exists():
-        return None
-    try:
-        data = json.loads(CONFIG_PATH.read_text(encoding="utf-8"))
-        login = data.get("smsc_login", "").strip()
-        password = data.get("smsc_password", "").strip()
-        if login and password:
-            return login, password
-    except Exception:
-        pass
+    cfg = _load_config()
+    login = cfg.get("smsc_login", "").strip()
+    password = cfg.get("smsc_password", "").strip()
+    if login and password:
+        return login, password
     return None
 
 

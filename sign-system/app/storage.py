@@ -32,3 +32,9 @@ class TokenStorage:
     def all(self) -> dict:
         with self._lock:
             return self._load()
+
+    def delete(self, token: str):
+        with self._lock:
+            data = self._load()
+            data.pop(token, None)
+            self._dump(data)
