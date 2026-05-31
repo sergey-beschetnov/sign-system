@@ -296,9 +296,12 @@ async def delete_user(phone: str, request: Request):
     if target == session.get("phone"):
         raise HTTPException(400, "Нельзя удалить собственный аккаунт")
     admins = load_admins()
-    new_admins = [a for a in admins if a["phone"] != target]
-    if len(new_admins) == len(admins):
+    target_admin = next((a for a in admins if a["phone"] == target), None)
+    if not target_admin:
         raise HTTPException(404, "Пользователь не найден")
+    if target_admin.get("role") == "superadmin":
+        raise HTTPException(403, "Нельзя удалить суперадминистратора")
+    new_admins = [a for a in admins if a["phone"] != target]
     save_admins(new_admins)
     return JSONResponse({"ok": True})
 

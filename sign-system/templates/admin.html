@@ -499,6 +499,88 @@
     flex: 1;
   }
 
+  /* ── Confirm modal ── */
+  .confirm-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.65);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 400;
+    padding: 20px;
+    display: none;
+    backdrop-filter: blur(3px);
+  }
+  .confirm-overlay.show { display: flex; }
+  .confirm-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    width: 100%;
+    max-width: 360px;
+    padding: 24px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  }
+  .confirm-icon {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    background: rgba(180,50,50,0.1);
+    border: 1px solid rgba(180,50,50,0.25);
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 16px;
+    color: #c05050;
+  }
+  .confirm-title {
+    font-size: 15px;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 8px;
+  }
+  .confirm-sub {
+    font-size: 12px;
+    color: var(--text-dim);
+    text-align: center;
+    margin-bottom: 20px;
+    line-height: 1.5;
+  }
+  .confirm-sub b { color: var(--text); }
+  .confirm-btns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .btn-cancel {
+    padding: 11px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    font-size: 12px;
+    font-weight: 700;
+    font-family: 'Gilroy', sans-serif;
+    cursor: pointer;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    transition: border-color 0.2s;
+  }
+  .btn-cancel:hover { border-color: var(--text-dim); }
+  .btn-confirm-del {
+    padding: 11px;
+    background: #b83232;
+    border: none;
+    border-radius: 6px;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    font-family: 'Gilroy', sans-serif;
+    cursor: pointer;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    transition: background 0.2s;
+  }
+  .btn-confirm-del:hover { background: #9a2828; }
+
   .whatsapp-btn {
     display: inline-flex;
     align-items: center;
@@ -865,6 +947,21 @@
 
 </div>
 
+<!-- Модалка: подтверждение удаления -->
+<div class="confirm-overlay" id="confirmOverlay">
+  <div class="confirm-box">
+    <div class="confirm-icon">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+    </div>
+    <div class="confirm-title" id="confirmTitle">Удалить?</div>
+    <div class="confirm-sub" id="confirmSub"></div>
+    <div class="confirm-btns">
+      <button class="btn-cancel" onclick="closeConfirm()">Отмена</button>
+      <button class="btn-confirm-del" id="confirmOkBtn">Удалить</button>
+    </div>
+  </div>
+</div>
+
 <!-- Модалка: управление пользователями -->
 <div class="modal-overlay" id="usersModal" onclick="closeUsersModal(event)">
   <div class="modal">
@@ -1059,12 +1156,37 @@ function copyToClip(text) {
   navigator.clipboard.writeText(text).then(() => alert('Ссылка скопирована'));
 }
 
+// ── Модалка подтверждения ──
+let _confirmCallback = null;
+
+function showConfirm(title, sub, callback) {
+  document.getElementById('confirmTitle').textContent = title;
+  document.getElementById('confirmSub').innerHTML = sub;
+  _confirmCallback = callback;
+  document.getElementById('confirmOverlay').classList.add('show');
+  document.getElementById('confirmOkBtn').onclick = () => { closeConfirm(); callback(); };
+}
+
+function closeConfirm() {
+  document.getElementById('confirmOverlay').classList.remove('show');
+  _confirmCallback = null;
+}
+
+document.getElementById('confirmOverlay').addEventListener('click', e => {
+  if (e.target === document.getElementById('confirmOverlay')) closeConfirm();
+});
+
 async function deleteContract(token) {
-  if (!confirm('Удалить договор и все файлы? Это действие необратимо.')) return;
-  const res = await fetch(`/admin/contracts/${token}`, { method: 'DELETE' });
-  const data = await res.json();
-  if (!res.ok) { alert(data.detail || 'Ошибка'); return; }
-  loadContracts();
+  showConfirm(
+    'Удалить договор?',
+    'Файлы договора и подпись будут удалены без возможности восстановления.',
+    async () => {
+      const res = await fetch(`/admin/contracts/${token}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (!res.ok) { alert(data.detail || 'Ошибка'); return; }
+      loadContracts();
+    }
+  );
 }
 
 // ── Суперадмин: управление пользователями ──
@@ -1113,9 +1235,12 @@ async function loadUsers() {
       ? `<span class="role-badge superadmin">${roleLabel}</span>`
       : `<span class="role-badge admin">${roleLabel}</span>`;
     const isSelf = u.phone === MY_PHONE;
+    const canDelete = !isSelf && u.role !== 'superadmin';
     const delBtn = isSelf
       ? '<span style="color:var(--text-dim);font-size:11px;font-style:italic;">вы</span>'
-      : `<button class="btn-danger" onclick="deleteUser('${u.phone}')">Удалить</button>`;
+      : canDelete
+        ? `<button class="btn-danger" onclick="deleteUser('${u.phone}','${u.name.replace(/'/g,"\\'")}')">Удалить</button>`
+        : '<span style="color:var(--text-dim);font-size:11px;">—</span>';
     return `<tr>
       <td><b>${u.name}</b></td>
       <td style="color:var(--text-dim)">${u.phone}</td>
@@ -1142,12 +1267,17 @@ async function addUser() {
   loadUsers();
 }
 
-async function deleteUser(phone) {
-  if (!confirm('Удалить пользователя?')) return;
-  const res = await fetch(`/admin/users/${encodeURIComponent(phone)}`, { method: 'DELETE' });
-  const data = await res.json();
-  if (!res.ok) { alert(data.detail || 'Ошибка'); return; }
-  loadUsers();
+async function deleteUser(phone, name) {
+  showConfirm(
+    'Удалить пользователя?',
+    `Пользователь <b>${name}</b> потеряет доступ к системе.`,
+    async () => {
+      const res = await fetch(`/admin/users/${encodeURIComponent(phone)}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (!res.ok) { alert(data.detail || 'Ошибка'); return; }
+      loadUsers();
+    }
+  );
 }
 
 loadContracts();
