@@ -15,8 +15,12 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from pydantic import BaseModel
 import uvicorn
 
+from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.triggers.cron import CronTrigger
+
 from .pdf_utils import embed_signature_on_pdf
 from .storage import TokenStorage
+from .scheduler import run_daily_backup
 from .auth import (
     is_allowed, generate_otp, verify_otp, check_otp_rate_limit,
     create_session, get_session, delete_session, send_sms,
@@ -33,6 +37,20 @@ def _html_escape(s: str) -> str:
              .replace(">", "&gt;").replace('"', "&quot;").replace("'", "&#x27;"))
 
 app = FastAPI(title="Sign System - ЦОМ")
+
+
+@app.on_event("startup")
+def start_scheduler():
+    scheduler = BackgroundScheduler(timezone="Asia/Almaty")
+    scheduler.add_job(
+        func=lambda: run_daily_backup(BASE_DIR),
+        trigger=CronTrigger(hour=17, minute=0),
+        id="daily_backup",
+        replace_existing=True,
+        misfire_grace_time=3600,  # запустит если сервер был выключен в 17:00
+    )
+    scheduler.start()
+    print("[Backup] Планировщик запущен — резервная копия каждый день в 17:00 (Алматы)")
 
 # CORS ограничен — только запросы с того же сервера
 app.add_middleware(

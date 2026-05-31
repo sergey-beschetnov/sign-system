@@ -17,6 +17,7 @@ data/
 sign-system/uploads/
 sign-system/signed/
 sign-system/tokens.json
+sign-system/backup/
 
 # Конфиг с телефонами (локальный)
 sign-system/config.json
