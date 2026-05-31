@@ -137,6 +137,10 @@ def send_sms(phone: str, code: str) -> bool:
     from urllib.request import urlopen
     from urllib.parse import urlencode
 
+    if not _load_config().get("sms_enabled", True):
+        print(f"[SMS] отключён (sms_enabled=false) → {phone}  код: {code}")
+        return False
+
     creds = _load_smsc_credentials()
     if not creds:
         print(f"[SMS] smsc.ru не настроен → {phone}  код: {code}")

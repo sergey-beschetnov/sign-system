@@ -390,6 +390,115 @@
     .admin-profile { padding: 6px; }
   }
 
+  /* ── Profile dropdown ── */
+  .admin-profile { position: relative; cursor: pointer; }
+  .admin-profile.open { border-color: var(--green); }
+
+  .profile-chevron {
+    color: var(--text-dim);
+    transition: transform 0.2s;
+    flex-shrink: 0;
+    margin-left: 2px;
+  }
+  .admin-profile.open .profile-chevron { transform: rotate(180deg); }
+
+  .profile-dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    min-width: 190px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    box-shadow: 0 8px 28px rgba(0,0,0,0.35);
+    padding: 5px;
+    display: none;
+    z-index: 200;
+  }
+  .profile-dropdown.show { display: block; }
+
+  .pd-item {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 9px 11px;
+    border-radius: 5px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+    cursor: pointer;
+    transition: background 0.15s;
+    text-decoration: none;
+    border: none;
+    background: none;
+    width: 100%;
+    font-family: 'Gilroy', sans-serif;
+    text-align: left;
+  }
+  .pd-item:hover { background: var(--surface2); }
+  .pd-item.danger { color: #c05050; }
+  .pd-item.danger:hover { background: rgba(180,50,50,0.08); }
+  .pd-sep { height: 1px; background: var(--border); margin: 4px 6px; }
+
+  /* ── Modal ── */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 300;
+    padding: 20px;
+    display: none;
+    backdrop-filter: blur(2px);
+  }
+  .modal-overlay.show { display: flex; }
+
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    width: 100%;
+    max-width: 660px;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  }
+
+  .modal-head {
+    display: flex;
+    align-items: center;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    gap: 10px;
+  }
+  .modal-title {
+    font-size: 13px;
+    font-weight: 700;
+    flex: 1;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .modal-close {
+    width: 28px; height: 28px;
+    display: flex; align-items: center; justify-content: center;
+    border: none; background: none; cursor: pointer;
+    color: var(--text-dim);
+    border-radius: 4px;
+    transition: color 0.2s, background 0.2s;
+    font-size: 18px; line-height: 1;
+  }
+  .modal-close:hover { color: var(--text); background: var(--surface2); }
+
+  .modal-body {
+    padding: 20px;
+    overflow-y: auto;
+    flex: 1;
+  }
+
   .whatsapp-btn {
     display: inline-flex;
     align-items: center;
@@ -620,17 +729,24 @@
       <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
     </svg>
   </button>
-  <div class="admin-profile">
+  <div class="admin-profile" id="profileTrigger" onclick="toggleProfileMenu(event)">
     <div class="admin-avatar" id="adminAvatar">А</div>
     <div class="admin-info">
       <div class="admin-name" id="adminName">{{ADMIN_NAME}}</div>
       <div class="admin-phone">{{ADMIN_PHONE}}</div>
     </div>
-    <a href="/admin/logout" class="admin-logout" title="Выйти">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
-      </svg>
-    </a>
+    <svg class="profile-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+    <div class="profile-dropdown" id="profileDropdown" onclick="event.stopPropagation()">
+      <button class="pd-item" id="pdUsers" style="display:none" onclick="openUsersModal()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Пользователи
+      </button>
+      <div class="pd-sep" id="pdSep" style="display:none"></div>
+      <a href="/admin/logout" class="pd-item danger">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Выйти
+      </a>
+    </div>
   </div>
 </div>
 
@@ -728,45 +844,53 @@
     </div>
   </div>
 
-  <!-- Панель пользователей — только для суперадмина -->
-  <div class="card" id="usersPanel" style="display:none">
-    <h2 style="margin-bottom:16px;">Пользователи</h2>
-    <div class="table-wrap">
-      <table class="users-table">
-        <thead>
-          <tr>
-            <th>Имя</th>
-            <th>Телефон</th>
-            <th>Роль</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody id="usersTbody"></tbody>
-      </table>
+
+</div>
+
+<!-- Модалка: управление пользователями -->
+<div class="modal-overlay" id="usersModal" onclick="closeUsersModal(event)">
+  <div class="modal">
+    <div class="modal-head">
+      <span class="modal-title">Пользователи системы</span>
+      <button class="modal-close" onclick="closeUsersModal()">✕</button>
     </div>
-    <div class="add-user-form">
-      <div class="form-group">
-        <label>ФИО</label>
-        <input type="text" id="newUserName" placeholder="Иванов Иван">
+    <div class="modal-body">
+      <div class="table-wrap" style="margin-bottom:0;">
+        <table class="users-table">
+          <thead>
+            <tr>
+              <th>Имя</th>
+              <th>Телефон</th>
+              <th>Роль</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="usersTbody"></tbody>
+        </table>
       </div>
-      <div class="form-group">
-        <label>Телефон</label>
-        <input type="tel" id="newUserPhone" placeholder="+7 777 000 00 00">
-      </div>
-      <div class="form-group">
-        <label>Роль</label>
-        <select id="newUserRole">
-          <option value="admin">Администратор</option>
-          <option value="superadmin">Суперадмин</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>&nbsp;</label>
-        <button class="btn btn-primary" onclick="addUser()" style="margin-top:0;">Добавить</button>
+      <div class="add-user-form">
+        <div class="form-group">
+          <label>ФИО</label>
+          <input type="text" id="newUserName" placeholder="Иванов Иван">
+        </div>
+        <div class="form-group">
+          <label>Телефон</label>
+          <input type="tel" id="newUserPhone" placeholder="+7 777 000 00 00">
+        </div>
+        <div class="form-group">
+          <label>Роль</label>
+          <select id="newUserRole">
+            <option value="admin">Администратор</option>
+            <option value="superadmin">Суперадмин</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>&nbsp;</label>
+          <button class="btn btn-primary" onclick="addUser()" style="margin-top:0;">Добавить</button>
+        </div>
       </div>
     </div>
   </div>
-
 </div>
 
 <footer style="text-align:center;padding:24px 20px 32px;margin-top:-8px;">
@@ -856,6 +980,12 @@ function copyLink() {
 const IS_SUPERADMIN = '{{ADMIN_ROLE}}' === 'superadmin';
 const MY_PHONE = '{{ADMIN_PHONE}}';
 
+// Инициализация аватара
+(function() {
+  const name = '{{ADMIN_NAME}}';
+  if (name) document.getElementById('adminAvatar').textContent = name.charAt(0).toUpperCase();
+})();
+
 async function loadContracts() {
   try {
     const res = await fetch('/admin/contracts');
@@ -880,7 +1010,7 @@ async function loadContracts() {
     const tbody = document.getElementById('contractsTbody');
     tbody.innerHTML = entries.map(([token, d]) => {
       const signUrl = window.location.origin + '/sign/' + token;
-      const created = d.created_at ? d.created_at.substring(0, 16).replace('T', ' ') : '—';
+      const created = d.created_at ? d.created_at.substring(0, 10) : '—';
       const signed = d.signed;
       const badge = signed
         ? '<span class="badge badge-signed">Подписан</span>'
@@ -892,9 +1022,12 @@ async function loadContracts() {
         ? `<a href="/view/${token}" target="_blank" style="color:var(--green);font-size:12px;font-weight:600;">Открыть</a>
            &nbsp;<a href="/download/${token}" style="color:var(--text-dim);font-size:12px;">↓ Скачать</a>${delBtn}`
         : `<button class="btn-link" onclick="copyToClip('${signUrl}')">Скопировать ссылку</button>${delBtn}`;
+      const createdBy = d.created_by
+        ? `<div style="font-size:10px;color:var(--text-dim);margin-top:2px;letter-spacing:0.02em;">${d.created_by}</div>`
+        : '';
       return `<tr>
         <td><b>${d.contract_number || '—'}</b></td>
-        <td>${d.client_name || '—'}</td>
+        <td>${d.client_name || '—'}${createdBy}</td>
         <td>${d.client_phone || '—'}</td>
         <td style="color:var(--text-dim)">${created}</td>
         <td>${badge}</td>
@@ -919,13 +1052,38 @@ async function deleteContract(token) {
 }
 
 // ── Суперадмин: управление пользователями ──
+// ── Profile dropdown ──
+function toggleProfileMenu(e) {
+  e.stopPropagation();
+  const trigger = document.getElementById('profileTrigger');
+  const dropdown = document.getElementById('profileDropdown');
+  const isOpen = trigger.classList.toggle('open');
+  dropdown.classList.toggle('show', isOpen);
+}
+document.addEventListener('click', () => {
+  document.getElementById('profileTrigger').classList.remove('open');
+  document.getElementById('profileDropdown').classList.remove('show');
+});
+
+// ── Users modal ──
+function openUsersModal() {
+  document.getElementById('usersModal').classList.add('show');
+  document.getElementById('profileTrigger').classList.remove('open');
+  document.getElementById('profileDropdown').classList.remove('show');
+  loadUsers();
+}
+function closeUsersModal(e) {
+  if (e && e.target !== document.getElementById('usersModal')) return;
+  document.getElementById('usersModal').classList.remove('show');
+}
+
 function initSuperAdmin() {
   if (!IS_SUPERADMIN) return;
-  document.getElementById('usersPanel').style.display = 'block';
   document.getElementById('exportBtn').style.display = 'inline-flex';
+  document.getElementById('pdUsers').style.display = 'flex';
+  document.getElementById('pdSep').style.display = 'block';
   const nameEl = document.getElementById('adminName');
   nameEl.innerHTML += '<span class="role-badge superadmin">★ Суперадмин</span>';
-  loadUsers();
 }
 
 async function loadUsers() {
